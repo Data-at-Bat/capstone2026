@@ -53,4 +53,7 @@ jobs:
       - name: Analyze Syntax
         run: |
           # Checks for broken references or syntax errors in Dart
-          if [ -d "frontend" ]; then flutter analyze; fi
+          if [ -d "app" ]; then flutter analyze; fi
+      - name: Flutter Test
+        run: |
+          if [ -d "app" ]; then flutter test; fi
