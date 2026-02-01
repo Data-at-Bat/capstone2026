@@ -42,18 +42,27 @@ jobs:
           # If no 
           if [ -f "./mvnw" ]; then ./mvnw compile; fi
 
-  # Flutter Check for Frontend
+
+# Flutter Check for Frontend
   flutter-analyze:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app # This ensures all 'run' commands start inside /app
     steps:
       - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true
+          
+      - name: Install Dependencies
+        run: flutter pub get
+
       - name: Analyze Syntax
-        run: |
-          # Checks for broken references or syntax errors in Dart
-          if [ -d "app" ]; then flutter analyze; fi
+        run: flutter analyze
+
       - name: Flutter Test
-        run: |
-          if [ -d "app" ]; then flutter test; fi
+        run: flutter test
