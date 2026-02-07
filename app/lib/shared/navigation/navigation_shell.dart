@@ -1,35 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
-import 'package:app/features/subscription/presentation/screens/my_subscription_screen.dart';
-import 'package:app/features/historical_accuracy/presentation/screens/historical_accuracy_screen.dart';
+import 'package:go_router/go_router.dart';
 
-class NavigationShell extends StatefulWidget {
-  const NavigationShell({super.key});
+class NavigationShell extends StatelessWidget {
+  const NavigationShell({super.key, required this.navigationShell});
 
-  @override
-  State<NavigationShell> createState() => _NavigationShellState();
-}
-
-class _NavigationShellState extends State<NavigationShell> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _pages = <Widget>[
-    DailyPredictionsPage(),
-    MySubscriptionPage(),
-    HistoricalAccuracyPage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  final StatefulNavigationShell navigationShell;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Data at Bat')),
-      body: Center(child: _pages.elementAt(_selectedIndex)),
+      body: navigationShell,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -45,8 +26,8 @@ class _NavigationShellState extends State<NavigationShell> {
             label: 'Historical Accuracy',
           ),
         ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) => navigationShell.goBranch(index),
       ),
     );
   }
