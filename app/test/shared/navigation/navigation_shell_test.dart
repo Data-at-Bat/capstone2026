@@ -1,16 +1,17 @@
+import 'package:app/app/app.dart';
 import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
 import 'package:app/features/historical_accuracy/presentation/screens/historical_accuracy_screen.dart';
 import 'package:app/features/subscription/presentation/screens/my_subscription_screen.dart';
-import 'package:app/shared/navigation/navigation_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+// import 'package:go_router/go_router.dart';
 
 void main() {
   testWidgets('NavigationShell displays pages and navigates correctly', (
     WidgetTester tester,
   ) async {
     // Build app and trigger a frame.
-    await tester.pumpWidget(MaterialApp(home: NavigationShell()));
+    await tester.pumpWidget(const MyApp());
 
     // Verify that the default page is DailyPredictionsPage.
     expect(find.byType(DailyPredictionsPage), findsOneWidget);
