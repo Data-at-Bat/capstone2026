@@ -23,7 +23,7 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: '/daily-predictions',
-                builder: (context, state) => const DailyPredictionsPage(),
+                builder: (context, state) => DailyPredictionsPage(),
               ),
             ],
           ),
