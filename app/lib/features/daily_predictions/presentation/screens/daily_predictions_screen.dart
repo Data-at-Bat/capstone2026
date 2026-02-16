@@ -1,24 +1,15 @@
-// import 'package:flutter/material.dart';
-
-// class DailyPredictionsPage extends StatelessWidget {
-//   const DailyPredictionsPage({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const Center(child: Text('Daily Predictions'));
-//   }
-// }
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:app/shared/logging/logger_service.dart';
 
 // --- DATA MODEL ---
 class GameMatchup {
   final String homeTeamName;
-  final String homeTeamAbbr; // Must match the filename in assets/logos/
+  final String homeTeamAbbr;
   final String awayTeamName;
-  final String awayTeamAbbr; // Must match the filename in assets/logos/
+  final String awayTeamAbbr;
   final DateTime gameTime;
-  final int gameId; // Unique identifier for logging purposes
+  final int gameId;
 
   GameMatchup({
     required this.homeTeamName,
@@ -33,7 +24,6 @@ class GameMatchup {
 class DailyPredictionsPage extends StatelessWidget {
   DailyPredictionsPage({super.key});
 
-  // --- PLACEHOLDER DATA USING YOUR PROJECT COLORS ---
   final List<GameMatchup> placeholderGames = [
     GameMatchup(
       homeTeamName: "Los Angeles Dodgers",
@@ -64,10 +54,10 @@ class DailyPredictionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFC6DDF0), // Light Blue [User Prompt]
+      backgroundColor: const Color(0xFFC6DDF0),
       appBar: AppBar(
         title: const Text('Daily Predictions'),
-        backgroundColor: const Color(0xFF462255), // Dark Purple [User Prompt]
+        backgroundColor: const Color(0xFF462255),
         foregroundColor: Colors.white,
       ),
       body: ListView.builder(
@@ -87,15 +77,15 @@ class GameListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String formattedTime = DateFormat.jm().format(game.gameTime);
+
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
-          // Log navigation event per project requirements
           try {
-            // Navigation logic here
             LoggerService.logEvent(
               fileName: 'daily_predictions_screen.dart',
               functionName: 'onGameClicked(${game.gameId})',
@@ -116,20 +106,49 @@ class GameListItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildTeamDisplay(game.awayTeamName, game.awayTeamAbbr, const Color(0xFFED6A5A)), // Coral
-                  const Text("AT", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey)),
-                  _buildTeamDisplay(game.homeTeamName, game.homeTeamAbbr, const Color(0xFF2374AB)), // Blue
+                  Expanded(
+                    child: _buildTeamDisplay(
+                      game.awayTeamName,
+                      game.awayTeamAbbr,
+                      const Color(0xFFED6A5A),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      "AT",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildTeamDisplay(
+                      game.homeTeamName,
+                      game.homeTeamAbbr,
+                      const Color(0xFF2374AB),
+                    ),
+                  ),
                 ],
               ),
               const Divider(height: 30, indent: 20, endIndent: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.calendar_today, size: 16, color: Color(0xFF143109)), // Dark Green
+                  const Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: Color(0xFF143109),
+                  ),
                   const SizedBox(width: 8),
                   Text(
-                    "Start Time: ${game.gameTime.hour}:${game.gameTime.minute.toString().padLeft(2, '0')} PM",
-                    style: const TextStyle(color: Color(0xFF143109), fontWeight: FontWeight.bold),
+                    "Start Time: $formattedTime",
+                    style: const TextStyle(
+                      color: Color(0xFF143109),
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -142,6 +161,7 @@ class GameListItem extends StatelessWidget {
 
   Widget _buildTeamDisplay(String name, String abbr, Color circleColor) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         CircleAvatar(
           radius: 35,
@@ -151,13 +171,20 @@ class GameListItem extends StatelessWidget {
             child: Image.asset(
               'assets/logos/$abbr.png',
               fit: BoxFit.contain,
-              // Fallback if the PNG isn't found or is corrupted
-              errorBuilder: (context, error, stackTrace) => const Icon(Icons.sports_baseball, color: Colors.white, size: 30),
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.sports_baseball,
+                color: Colors.white,
+                size: 30,
+              ),
             ),
           ),
         ),
         const SizedBox(height: 8),
-        Text(abbr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        Text(
+          abbr,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
       ],
     );
   }
