@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class GameMatchup {
   final int gameId;
   final String homeTeamName;
