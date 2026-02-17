@@ -4,10 +4,13 @@ import 'package:app/features/daily_predictions/presentation/screens/daily_predic
 import 'package:app/features/subscription/presentation/screens/my_subscription_screen.dart';
 import 'package:app/features/historical_accuracy/presentation/screens/historical_accuracy_screen.dart';
 import 'package:app/shared/navigation/navigation_shell.dart';
+import 'package:app/repositories/game_repository.dart';
+
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
   static final _shellNavigatorKey = GlobalKey<NavigatorState>();
+  static final GameRepository _gameRepository = GameRepository();
 
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -23,7 +26,9 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: '/daily-predictions',
-                builder: (context, state) => DailyPredictionsPage(),
+                builder: (context, state) => DailyPredictionsPage(
+                  repository: _gameRepository,
+                ),
               ),
             ],
           ),
