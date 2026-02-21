@@ -1,4 +1,3 @@
-com\dataabat\data_at_bat_api\persistence\PlaceholderRepository.class
-com\dataabat\data_at_bat_api\services\PlaceholderService.class
-com\dataabat\data_at_bat_api\presentation\PlaceholderController.class
-com\dataabat\data_at_bat_api\DataAtBatApiApplication.class
+com/dataabat/data_at_bat_api/persistence/GameEntity$GameEntityBuilder.class
+com/dataabat/data_at_bat_api/persistence/GameEntity.class
+com/dataabat/data_at_bat_api/persistence/GameRepository.class

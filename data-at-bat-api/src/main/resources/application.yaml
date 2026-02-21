@@ -1,3 +1,20 @@
 spring:
   application:
     name: data-at-bat-api
+  docker:
+    compose:
+      enabled: false
+  datasource:
+    url: jdbc:postgresql://ep-lingering-voice-ai9gwd23-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
