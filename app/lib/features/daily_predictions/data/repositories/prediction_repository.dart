@@ -1,6 +1,6 @@
-import '../models/game_matchup.dart';
+import 'package:app/models/game_matchup.dart';
 
-class GameRepository {
+class PredictionRepository {
   // Toggle this when the backend API is stood up
   final bool _useMockData = true;
 

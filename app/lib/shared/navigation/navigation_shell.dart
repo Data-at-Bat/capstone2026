@@ -9,7 +9,7 @@ class NavigationShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Data at Bat')),
+      // AppBar removed as child pages provide their own
       body: navigationShell,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:app/models/game_matchup.dart';
-import 'package:app/repositories/game_repository.dart';
+import 'package:app/features/daily_predictions/presentation/providers/prediction_provider.dart';
+import 'package:app/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:app/shared/logging/logger_service.dart';
 import 'package:app/features/daily_predictions/presentation/screens/game_detail_screen.dart';
 
-class DailyPredictionsPage extends StatelessWidget {
-  final GameRepository repository;
-  final bool isUserPaid = false; // Placeholder for subscription logic
-
-  const DailyPredictionsPage({super.key, required this.repository});
+class DailyPredictionsPage extends ConsumerWidget {
+  const DailyPredictionsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final predictionsAsyncValue = ref.watch(dailyPredictionsProvider);
+    final subscriptionState = ref.watch(subscriptionStateProvider);
+    final isUserPaid = subscriptionState.value ?? false;
+
     return Scaffold(
       backgroundColor: const Color(0xFFC6DDF0), // Original Light Blue
       appBar: AppBar(
@@ -20,22 +23,11 @@ class DailyPredictionsPage extends StatelessWidget {
         backgroundColor: const Color(0xFF462255), // Original Dark Purple
         foregroundColor: Colors.white,
       ),
-      body: FutureBuilder<List<GameMatchup>>(
-        future: repository.fetchDailyGames(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF462255)),
-            );
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          }
-
-          final games = snapshot.data ?? [];
+      body: predictionsAsyncValue.when(
+        data: (games) {
           if (games.isEmpty) {
             return const Center(child: Text("No games found for today."));
           }
-
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: games.length,
@@ -45,6 +37,10 @@ class DailyPredictionsPage extends StatelessWidget {
             ),
           );
         },
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: Color(0xFF462255)),
+        ),
+        error: (err, stack) => Center(child: Text("Error: $err")),
       ),
     );
   }

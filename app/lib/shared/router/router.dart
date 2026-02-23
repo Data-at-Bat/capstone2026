@@ -1,34 +1,65 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:app/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
 import 'package:app/features/subscription/presentation/screens/my_subscription_screen.dart';
 import 'package:app/features/historical_accuracy/presentation/screens/historical_accuracy_screen.dart';
+import 'package:app/features/auth/presentation/screens/login_screen.dart';
 import 'package:app/shared/navigation/navigation_shell.dart';
-import 'package:app/repositories/game_repository.dart';
 
+final routerNotifierProvider = Provider<RouterNotifier>((ref) {
+  return RouterNotifier(ref);
+});
 
-class AppRouter {
-  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
-  static final _shellNavigatorKey = GlobalKey<NavigatorState>();
-  static final GameRepository _gameRepository = GameRepository();
+final routerProvider = Provider<GoRouter>((ref) {
+  final notifier = ref.watch(routerNotifierProvider);
 
-  static final router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
+  return GoRouter(
+    navigatorKey: GlobalKey<NavigatorState>(),
     initialLocation: '/daily-predictions',
+    refreshListenable: notifier,
+    redirect: (context, state) {
+      final authState = ref.read(authStateProvider);
+      final subState = ref.read(subscriptionStateProvider);
+
+      final isLoggedIn = authState.value != null;
+      final isSubscribed = subState.value == true;
+
+      final isLoggingIn = state.uri.path == '/login';
+
+      if (!isLoggedIn) {
+        return isLoggingIn ? null : '/login';
+      }
+
+      if (isLoggingIn) {
+        if (!isSubscribed) {
+          return '/my-subscription';
+        }
+        return '/daily-predictions';
+      }
+
+      if (!isSubscribed) {
+        if (state.uri.path == '/daily-predictions') {
+          return '/my-subscription';
+        }
+      }
+
+      return null;
+    },
     routes: [
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return NavigationShell(navigationShell: navigationShell);
         },
         branches: [
           StatefulShellBranch(
-            navigatorKey: _shellNavigatorKey,
             routes: [
               GoRoute(
                 path: '/daily-predictions',
-                builder: (context, state) => DailyPredictionsPage(
-                  repository: _gameRepository,
-                ),
+                builder: (context, state) => const DailyPredictionsPage(),
               ),
             ],
           ),
@@ -52,4 +83,19 @@ class AppRouter {
       ),
     ],
   );
+});
+
+class RouterNotifier extends ChangeNotifier {
+  final Ref _ref;
+
+  RouterNotifier(this._ref) {
+    _ref.listen<AsyncValue<String?>>(
+      authStateProvider,
+      (_, _) => notifyListeners(),
+    );
+    _ref.listen<AsyncValue<bool>>(
+      subscriptionStateProvider,
+      (_, _) => notifyListeners(),
+    );
+  }
 }
