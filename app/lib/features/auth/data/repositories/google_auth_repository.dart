@@ -14,10 +14,7 @@ class GoogleAuthRepository implements AuthRepository {
   }
 
   @override
-  Stream<String?> get authStateChanges async* {
-    yield _googleSignIn.currentUser?.id;
-    yield* _authStateController.stream;
-  }
+  Stream<String?> get authStateChanges => _authStateController.stream;
 
   @override
   String? get currentUser => _googleSignIn.currentUser?.id;
@@ -29,11 +26,6 @@ class GoogleAuthRepository implements AuthRepository {
       if (account == null) {
         throw Exception('Sign in cancelled by user');
       }
-      
-      final authentication = await account.authentication;
-      final accessToken = authentication.accessToken;
-      final idToken = authentication.idToken;
-      
     } catch (e) {
       rethrow;
     }
@@ -43,7 +35,6 @@ class GoogleAuthRepository implements AuthRepository {
   Future<void> signOut() async {
     try {
       await _googleSignIn.signOut();
-      await _googleSignIn.disconnect();
     } catch (e) {
       rethrow;
     }

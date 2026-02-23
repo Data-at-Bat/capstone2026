@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'package:app/features/auth/data/repositories/google_auth_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:app/features/auth/data/repositories/google_auth_repository.dart';
 
 class FakeGoogleSignIn extends Fake implements GoogleSignIn {
   final StreamController<GoogleSignInAccount?> _controller =
@@ -15,7 +15,7 @@ class FakeGoogleSignIn extends Fake implements GoogleSignIn {
 
   @override
   Stream<GoogleSignInAccount?> get onCurrentUserChanged => _controller.stream;
-  
+
   @override
   GoogleSignInAccount? get currentUser => _currentUser;
 
@@ -28,7 +28,7 @@ class FakeGoogleSignIn extends Fake implements GoogleSignIn {
     _controller.add(_currentUser);
     return _currentUser;
   }
-  
+
   @override
   Future<GoogleSignInAccount?> signOut() async {
     final oldUser = _currentUser;
@@ -36,18 +36,13 @@ class FakeGoogleSignIn extends Fake implements GoogleSignIn {
     _controller.add(null);
     return oldUser;
   }
-  
-  @override
-  Future<GoogleSignInAccount?> disconnect() async {
-    return signOut();
-  }
 }
 
 class FakeGoogleSignInAccount extends Fake implements GoogleSignInAccount {
   @override
   Future<GoogleSignInAuthentication> get authentication async =>
       FakeGoogleSignInAuthentication();
-  
+
   @override
   String get id => 'fake-user-id';
 }
@@ -61,38 +56,34 @@ class FakeGoogleSignInAuthentication extends Fake
   String? get idToken => 'fake-id-token';
 }
 
-
 void main() {
   late GoogleAuthRepository repository;
 
-  group('GoogleAuthRepository - Success', () {
-    setUp(() {
+  group('GoogleAuthRepository', () {
+    test('signInWithGoogle success', () async {
       final fakeGoogleSignIn = FakeGoogleSignIn();
       repository = GoogleAuthRepository(googleSignIn: fakeGoogleSignIn);
+
+      await repository.signInWithGoogle();
+      expect(repository.currentUser, 'fake-user-id');
     });
 
-    test('signInWithGoogle should complete and update user state', () async {
-      await repository.signInWithGoogle();
-      expect(repository.currentUser, isNotNull);
+    test('signInWithGoogle failure', () async {
+      final fakeGoogleSignIn = FakeGoogleSignIn(signInShouldFail: true);
+      repository = GoogleAuthRepository(googleSignIn: fakeGoogleSignIn);
+
+      expect(repository.signInWithGoogle(), throwsException);
     });
 
-    test('signOut should clear the user', () async {
+    test('signOut', () async {
+      final fakeGoogleSignIn = FakeGoogleSignIn();
+      repository = GoogleAuthRepository(googleSignIn: fakeGoogleSignIn);
+
       await repository.signInWithGoogle();
-      expect(repository.currentUser, isNotNull);
+      expect(repository.currentUser, 'fake-user-id');
 
       await repository.signOut();
       expect(repository.currentUser, isNull);
-    });
-  });
-
-  group('GoogleAuthRepository - Failure', () {
-    setUp(() {
-      final fakeGoogleSignIn = FakeGoogleSignIn(signInShouldFail: true);
-      repository = GoogleAuthRepository(googleSignIn: fakeGoogleSignIn);
-    });
-
-    test('signInWithGoogle should throw exception when sign in returns null', () {
-      expect(() => repository.signInWithGoogle(), throwsException);
     });
   });
 }
