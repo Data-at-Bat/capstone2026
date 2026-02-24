@@ -1,3 +1,6 @@
 com/dataabat/data_at_bat_api/persistence/GameEntity$GameEntityBuilder.class
 com/dataabat/data_at_bat_api/persistence/GameEntity.class
+com/dataabat/data_at_bat_api/persistence/FavoritesEntity.class
 com/dataabat/data_at_bat_api/persistence/GameRepository.class
+com/dataabat/data_at_bat_api/persistence/FavoritesEntity$FavoritesEntityBuilder.class
+com/dataabat/data_at_bat_api/persistence/FavoritesRepository.class
