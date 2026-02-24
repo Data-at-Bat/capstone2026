@@ -1,8 +1,0 @@
-/Users/diegogarcia/capstone2026/data-at-bat-api/src/main/java/com/dataabat/data_at_bat_api/DataAtBatApiApplication.java
-/Users/diegogarcia/capstone2026/data-at-bat-api/src/main/java/com/dataabat/data_at_bat_api/persistence/FavoritesEntity.java
-/Users/diegogarcia/capstone2026/data-at-bat-api/src/main/java/com/dataabat/data_at_bat_api/persistence/FavoritesRepository.java
-/Users/diegogarcia/capstone2026/data-at-bat-api/src/main/java/com/dataabat/data_at_bat_api/persistence/GameEntity.java
-/Users/diegogarcia/capstone2026/data-at-bat-api/src/main/java/com/dataabat/data_at_bat_api/persistence/GameRepository.java
-/Users/diegogarcia/capstone2026/data-at-bat-api/src/main/java/com/dataabat/data_at_bat_api/persistence/PlaceholderRepository.java
-/Users/diegogarcia/capstone2026/data-at-bat-api/src/main/java/com/dataabat/data_at_bat_api/presentation/PlaceholderController.java
-/Users/diegogarcia/capstone2026/data-at-bat-api/src/main/java/com/dataabat/data_at_bat_api/services/PlaceholderService.java
