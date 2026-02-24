@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal" created-in="IU-253.30387.90">
+    <data-source name="postgresql://neondb_owner:npg_sPcTQ5tZaL2S@ep-lingering-voice-ai9gwd23-pooler.c-4.us-east-1.aws.neon.tech/neondb?sslmode=require&amp;channel_binding=require" uuid="fe895678-8f53-42d7-a532-bfb09eca1825">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" />
+      <secret-storage>master_key</secret-storage>
+      <schema-mapping />
+    </data-source>
+  </component>
+</project>
