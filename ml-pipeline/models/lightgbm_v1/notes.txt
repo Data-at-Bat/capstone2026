@@ -1,0 +1,57 @@
+Goal: home team win probability
+    binary classification
+    easy to validate
+
+3 Data Sources:
+    1. Game Results
+    2. Team/Player Stats
+    3. Betting Odds
+
+
+APIs:
+1. MLB Stats API
+    https://statsapi.mlb.com/api/v1/
+2. Odds API
+    https://the-odds-api.com/
+
+Scripts:
+fetch_schedule.py
+    game_id
+    date
+    home_team
+    away_team
+    home_pitcher
+    away_pitcher
+data/raw/schedule.csv
+
+fetch_game_results.py
+    game_id
+    home_score
+    away_score
+    home_win (t/f)
+this will become model label.
+
+fetch_odds.py
+    game_id
+    home_odds
+    away_odds
+    home_implied_prob
+    away_implied_prob
+implied prob formula:
+    positive: 100 / (odds+100)
+    negative: -100 / (-odds+100)
+
+build_dataset.py
+    game_id
+    home_team
+    away_team
+    home_pitcher_era
+    away_pitcher_era
+    home_team_win_pct
+    away_team_win_pct
+    home_odds
+    away_odds
+    home_win  ← LABEL
+data/processed/model_dataset.csv
+
+
