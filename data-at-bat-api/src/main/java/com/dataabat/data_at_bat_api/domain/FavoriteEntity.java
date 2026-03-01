@@ -7,7 +7,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name="favorites")
-public class Favorite {
+public class FavoriteEntity {
     @Getter
     @Setter
     @Id
@@ -24,9 +24,9 @@ public class Favorite {
     @Column(name="user_id")
     private UUID userId;
 
-    protected Favorite() {}
+    protected FavoriteEntity() {}
 
-    public Favorite(UUID team_Id, UUID user_Id) {
+    public FavoriteEntity(UUID team_Id, UUID user_Id) {
         teamId = team_Id;
         userId = user_Id;
     }

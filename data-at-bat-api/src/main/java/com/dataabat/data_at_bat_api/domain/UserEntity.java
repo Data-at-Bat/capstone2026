@@ -3,14 +3,13 @@ package com.dataabat.data_at_bat_api.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @Table(name="users")
-public class User {
+public class UserEntity {
     @Getter
     @Setter
     @Id
@@ -31,9 +30,9 @@ public class User {
     @Column(name="subscription_expiry")
     private LocalDateTime subscriptionExpiry;
 
-    protected User() { }
+    protected UserEntity() { }
 
-    public User(String email) {
+    public UserEntity(String email) {
         this.email = email;
         this.subscriptionStatus = false;
     }
