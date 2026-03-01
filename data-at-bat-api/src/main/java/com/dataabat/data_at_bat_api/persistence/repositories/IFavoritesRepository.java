@@ -1,4 +1,4 @@
-package com.dataabat.data_at_bat_api.services.repo_interfaces;
+package com.dataabat.data_at_bat_api.persistence.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import com.dataabat.data_at_bat_api.domain.FavoriteEntity;

@@ -16,12 +16,12 @@ public class FavoriteEntity {
 
     @Getter
     @Setter
-    @Column(name="team_id")
+    @Column(name="team_id", nullable = false)
     private UUID teamId;
 
     @Getter
     @Setter
-    @Column(name="user_id")
+    @Column(name="user_id", nullable = false)
     private UUID userId;
 
     protected FavoriteEntity() {}

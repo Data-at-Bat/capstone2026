@@ -4,16 +4,22 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="514ced99-57d4-4b85-b05c-aaf064f00e98" name="Changes" comment="update application.yaml">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/repo_interfaces/IGamesRepository.java" afterDir="false" />
+    <list default="true" id="514ced99-57d4-4b85-b05c-aaf064f00e98" name="Changes" comment="Refactor">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/GameFeatureEntity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/Favorite.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/FavoriteEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/UserEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/GameEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/GameEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/GameRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/PlaceholderService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/repo_interfaces/IFavoritesRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/repo_interfaces/IFavoritesRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/repo_interfaces/IUserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/repo_interfaces/IUserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/FavoriteEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/FavoriteEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/GameEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/GameEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/UserEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/repo_interfaces/IFavoritesRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/repositories/IFavoritesRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/repo_interfaces/IGamesRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/repositories/IGamesRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/repo_interfaces/IUserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/repositories/IUserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/domain/Favorite.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/domain/User.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/persistence/GameEntity$GameEntityBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/persistence/GameEntity.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/persistence/GameRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/services/repo_interfaces/IFavoritesRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/services/repo_interfaces/IUserRepository.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,8 +30,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="package-info" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -89,6 +95,9 @@
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\chris\OneDrive\Desktop\Projects\capstone2026\data-at-bat-api" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\chris\OneDrive\Desktop\Projects\capstone2026\data-at-bat-api\src\main\java\com\dataabat\data_at_bat_api\domain" />
+    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="com.dataabat.data_at_bat_api.domain" />
     </key>
@@ -146,7 +155,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772396741932</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Refactor">
+      <option name="closed" value="true" />
+      <created>1772399478959</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1772399478959</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -166,6 +183,7 @@
     <MESSAGE value="Connect to DB, create user repositories, and update dependencies" />
     <MESSAGE value="fix merge" />
     <MESSAGE value="update application.yaml" />
-    <option name="LAST_COMMIT_MESSAGE" value="update application.yaml" />
+    <MESSAGE value="Refactor" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor" />
   </component>
 </project>

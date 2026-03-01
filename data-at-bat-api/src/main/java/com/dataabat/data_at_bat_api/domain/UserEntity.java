@@ -11,13 +11,13 @@ import java.util.UUID;
 @Table(name="users")
 public class UserEntity {
     @Getter
-    @Setter
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private UUID uid;
 
     @Getter
     @Setter
+    @Column(nullable = false)
     private String email;
 
     @Getter
