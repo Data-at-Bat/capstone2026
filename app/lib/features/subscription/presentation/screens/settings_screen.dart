@@ -103,7 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }) {
     return Card(
       elevation: 0,
-      color: Colors.white.withOpacity(0.7),
+      color: Colors.white.withValues(alpha: 0.7),
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         leading: Icon(icon, color: const Color(0xFF462255)),
@@ -121,6 +121,6 @@ class _SettingsPageState extends State<SettingsPage> {
       functionName: 'navigate_to_$feature',
       outcome: 'Success',
     );
-    // TODO: Implement actual navigation
+    /* TODO: Implement actual navigation logging */
   }
 }
