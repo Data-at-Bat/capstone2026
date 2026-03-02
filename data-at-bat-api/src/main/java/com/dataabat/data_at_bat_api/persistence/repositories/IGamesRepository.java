@@ -1,6 +1,8 @@
 package com.dataabat.data_at_bat_api.persistence.repositories;
 
 import com.dataabat.data_at_bat_api.domain.GameEntity;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -30,11 +32,13 @@ public interface IGamesRepository extends CrudRepository<GameEntity, UUID> {
                                                       @Param("ids") List<UUID> teamIds);
     void deleteByStatus(String status);
 
+    @Modifying
     @Query("DELETE FROM GameEntity g WHERE g.homeTeamId IN :ids OR g.awayTeamId IN :ids")
     void deleteByTeamIdIn(@Param("ids") List<UUID> teamIds);
     void deleteByHomeTeamIdIn(List<UUID> homeTeamIds);
     void deleteByAwayTeamIdIn(List<UUID> awayTeamIds);
 
+    @Modifying
     @Query("DELETE FROM GameEntity g WHERE g.homeTeamId = :teamId OR g.awayTeamId = :teamId")
     void deleteByTeamId(@Param("teamId") UUID teamId);
     void deleteByHomeTeamId(UUID homeTeamId);
