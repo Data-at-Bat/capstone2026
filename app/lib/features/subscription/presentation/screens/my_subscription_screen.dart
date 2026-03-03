@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app/features/subscription/presentation/providers/subscription_provider.dart';
-import 'package:app/features/auth/presentation/providers/auth_provider.dart';
 
 class MySubscriptionPage extends ConsumerWidget {
   const MySubscriptionPage({super.key});
@@ -14,31 +13,23 @@ class MySubscriptionPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Subscription'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              ref.read(authControllerProvider.notifier).signOut();
-            },
-          ),
-        ],
       ),
       body: Center(
         child: subscriptionState.when(
           data: (isSubscribed) {
             if (isSubscribed) {
-              return Column(
+              return const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.check_circle, color: Colors.green, size: 64),
-                  const SizedBox(height: 16),
-                  const Text(
+                  Icon(Icons.check_circle, color: Colors.green, size: 64),
+                  SizedBox(height: 16),
+                  Text(
                     'You are subscribed!',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 8),
-                  const Text('Enjoy full access to MLB predictions.'),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 8),
+                  Text('Enjoy full access to MLB predictions.'),
+                  SizedBox(height: 32),
                   // Maybe show some subscription details or "Manage Subscription" button
                 ],
               );

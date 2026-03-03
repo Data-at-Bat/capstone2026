@@ -22,11 +22,6 @@ void main() {
       expect(paths, contains('/daily-predictions'));
       expect(paths, contains('/my-subscription'));
       expect(paths, contains('/historical-accuracy'));
-      
-      // Also verify auth routes
-      final loginRoute = router.configuration.routes.any((r) => r is GoRoute && r.path == '/login');
-      
-      expect(loginRoute, isTrue);
     });
   });
 }
