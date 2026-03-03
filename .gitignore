@@ -1,2 +1,7 @@
 .DS_Store
+.vscode
+*.pyc
 data-at-bat-api/.env
+
+# data files
+ml-pipeline/data/processed/*.csv
