@@ -1,6 +1,11 @@
 .DS_Store
+.vscode
+*.pyc
+data-at-bat-api/.env
 data/raw/*
 data/processed/*
 
+# data files
+ml-pipeline/data/processed/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
