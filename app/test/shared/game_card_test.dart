@@ -14,7 +14,7 @@ void main() {
     mockRepo = MockGameRepository();
   });
 
-  testWidgets('Behavioral: Tapping game card navigates to detail view', (tester) async {
+testWidgets('Behavioral: Tapping game card navigates to detail view', (tester) async {
     final game = GameMatchup(
         gameId: 101,
         gameTime: DateTime.now().add(const Duration(hours: 2)),
@@ -44,9 +44,15 @@ void main() {
       home: DailyPredictionsPage(repository: mockRepo),
     ));
 
+    // Wait for the FutureBuilder to finish its mock fetch and build the list
+    await tester.pumpAndSettle();
+
     // Verify Interaction
     await tester.tap(find.byType(InkWell));
-    await tester.pumpAndSettle();
+    
+    // This pumpAndSettle waits for the Navigator.push page transition animation to finish
+    await tester.pumpAndSettle(); 
+    
     expect(find.text('Predicted Winner: STL'), findsOneWidget);
   });
 
