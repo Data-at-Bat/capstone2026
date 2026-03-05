@@ -8,11 +8,11 @@ class GameDetailScreen extends StatelessWidget { // Can now be a stateless widge
   final bool isPaidMember;
 
   const GameDetailScreen({
-    Key? key,
+    super.key,
     required this.gameData,
     required this.userId,
     required this.isPaidMember,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
