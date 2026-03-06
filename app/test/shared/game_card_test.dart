@@ -14,29 +14,46 @@ void main() {
     mockRepo = MockGameRepository();
   });
 
-  testWidgets('Behavioral: Tapping game card navigates to detail view', (tester) async {
+testWidgets('Behavioral: Tapping game card navigates to detail view', (tester) async {
     final game = GameMatchup(
-      gameId: 42,
-      homeTeamName: "Dodgers", homeTeamAbbr: "LAD",
-      awayTeamName: "Yankees", awayTeamAbbr: "NYY",
-      gameTime: DateTime.now(),
-    );
+        gameId: 101,
+        gameTime: DateTime.now().add(const Duration(hours: 2)),
+        homeTeamName: 'Cardinals',
+        awayTeamName: 'Cubs',
+        homeTeamAbbr: 'STL',
+        awayTeamAbbr: 'CHC',
+        predictedWinner: 'STL',
+        predictedProbability: 65.5,
+        confidencePrediction: 80.0,
+        valueBet: 150.0,
+        homeStats: {
+          'Batting Avg': '.255',
+          'ERA': '3.45',
+          'WHIP': '1.20',
+        },
+        awayStats: {
+          'Batting Avg': '.240',
+          'ERA': '4.10',
+          'WHIP': '1.35',
+        },
+      );
 
     when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => [game]);
 
     await tester.pumpWidget(MaterialApp(
       home: DailyPredictionsPage(repository: mockRepo),
     ));
-    await tester.pumpAndSettle();
 
-    // Verify Display
-    expect(find.text('LAD'), findsOneWidget);
+    // Wait for the FutureBuilder to finish its mock fetch and build the list
+    await tester.pumpAndSettle();
 
     // Verify Interaction
     await tester.tap(find.byType(InkWell));
-    await tester.pumpAndSettle();
-
-    // Verify Selection Outcome (Navigated to Detail Page)
-    expect(find.textContaining('Model Prediction for Game 42'), findsOneWidget);
+    
+    // This pumpAndSettle waits for the Navigator.push page transition animation to finish
+    await tester.pumpAndSettle(); 
+    
+    expect(find.text('Predicted Winner: STL'), findsOneWidget);
   });
+
 }

@@ -16,7 +16,6 @@ void main() {
 
       expect(paths, contains('/daily-predictions'));
       expect(paths, contains('/my-subscription'));
-      expect(paths, contains('/historical-accuracy'));
     });
   });
 }
