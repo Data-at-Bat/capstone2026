@@ -24,14 +24,15 @@ public class GameService {
 
     // GET /games
     public List<GameEntity> getGames(LocalDateTime startDate, LocalDateTime endDate, List<UUID> teamIds) {
-        if (startDate == null) startDate = LocalDateTime.now().minusMonths(1);
-        if (endDate == null) endDate = LocalDateTime.now().plusWeeks(1);
+    if (startDate == null) startDate = LocalDateTime.now().minusMonths(1);
+    if (endDate == null) endDate = LocalDateTime.now().plusWeeks(1);
 
-        if (teamIds == null || teamIds.isEmpty()) {
-            return gamesRepository.findByGameTimeAndTeamId(startDate, endDate, List.of());
-        }
-        return gamesRepository.findByGameTimeAndTeamId(startDate, endDate, teamIds);
+    if (teamIds == null || teamIds.isEmpty()) {
+        // Return all games in the date range without team filter
+        return gamesRepository.findByGameTimeBetweenOrderByGameTimeAsc(startDate, endDate);
     }
+    return gamesRepository.findByGameTimeAndTeamId(startDate, endDate, teamIds);
+}
 
     // GET /games?id={id}
     public Optional<GameEntity> getGameById(UUID id) {
