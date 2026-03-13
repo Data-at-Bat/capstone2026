@@ -19,51 +19,54 @@ public class GameController {
         this.gameService = gameService;
     }
 
-    // GET /games?startDate=...&endDate=...&teamIds=...
     @GetMapping
-    public ResponseEntity<List<GameEntity>> getGames(
+    public ResponseEntity<List<GameResponse>> getGames(
             @RequestParam(required = false) LocalDateTime startDate,
             @RequestParam(required = false) LocalDateTime endDate,
             @RequestParam(required = false) List<UUID> teamIds) {
         return ResponseEntity.ok(gameService.getGames(startDate, endDate, teamIds));
     }
 
-    // GET /games?id={id}
     @GetMapping("/{id}")
-    public ResponseEntity<GameEntity> getGameById(@PathVariable UUID id) {
+    public ResponseEntity<GameResponse> getGameById(@PathVariable UUID id) {
         return gameService.getGameById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // POST /games
     @PostMapping
     public ResponseEntity<GameEntity> createGame(@RequestBody CreateGameRequest request) {
         GameEntity created = gameService.createGame(
-                request.gameTime(), request.homeTeamId(), request.awayTeamId());
+                request.gameTime(), request.homeTeamId(), request.awayTeamId(),
+                request.predictedWinner(), request.confidence(), request.spread(),
+                request.odds(), request.predictiveFactors());
         return ResponseEntity.ok(created);
     }
 
-    // PATCH /games/{id}
     @PatchMapping("/{id}")
     public ResponseEntity<GameEntity> updateGame(
             @PathVariable UUID id,
             @RequestBody UpdateGameRequest request) {
-        return gameService.updateGame(id, request.gameTime(), request.homeTeamId(), request.awayTeamId())
+        return gameService.updateGame(id, request.gameTime(), request.homeTeamId(), request.awayTeamId(),
+                request.predictedWinner(), request.confidence(), request.spread(),
+                request.odds(), request.predictiveFactors())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // DELETE /games/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGame(@PathVariable UUID id) {
-        if (gameService.deleteGame(id)) {
-            return ResponseEntity.noContent().build();
-        }
+        if (gameService.deleteGame(id)) return ResponseEntity.noContent().build();
         return ResponseEntity.notFound().build();
     }
 
-    // Request body records
-    public record CreateGameRequest(LocalDateTime gameTime, UUID homeTeamId, UUID awayTeamId) {}
-    public record UpdateGameRequest(LocalDateTime gameTime, UUID homeTeamId, UUID awayTeamId) {}
+    public record CreateGameRequest(
+            LocalDateTime gameTime, UUID homeTeamId, UUID awayTeamId,
+            String predictedWinner, Double confidence, Double spread,
+            Double odds, List<String> predictiveFactors) {}
+
+    public record UpdateGameRequest(
+            LocalDateTime gameTime, UUID homeTeamId, UUID awayTeamId,
+            String predictedWinner, Double confidence, Double spread,
+            Double odds, List<String> predictiveFactors) {}
 }

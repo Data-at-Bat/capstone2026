@@ -5,6 +5,7 @@ import com.dataabat.data_at_bat_api.services.FavoriteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.dataabat.data_at_bat_api.presentation.FavoritesResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -25,9 +26,9 @@ public class FavoriteController {
     }
 
     @GetMapping("/favorites")
-    public ResponseEntity<List<FavoriteEntity>> getFavorites(@RequestParam UUID userId) {
+    public ResponseEntity<FavoritesResponse> getFavorites(@RequestParam UUID userId) {
         List<FavoriteEntity> favorites = favoriteService.getFavoritesByUserId(userId);
-        return ResponseEntity.ok(favorites);
+        return ResponseEntity.ok(new FavoritesResponse(favorites));
     }
 
     @DeleteMapping("/favorites")
