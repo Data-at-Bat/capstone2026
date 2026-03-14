@@ -18,6 +18,8 @@ public interface IGamesRepository extends CrudRepository<GameEntity, UUID> {
     List<GameEntity> findByStatusAndTeamId(@Param("status") String status, @Param("teamId") UUID teamId);
     List<GameEntity> findByStatusAndHomeTeamId(String status, UUID HomeTeamId);
     List<GameEntity> findByStatusAndAwayTeamId(String status, UUID AwayTeamId);
+    List<GameEntity> findByGameTimeBetweenOrderByGameTimeAsc(LocalDateTime startDate, LocalDateTime endDate);
+
 
     @Query("SELECT g FROM GameEntity g WHERE g.homeTeamId IN :ids OR g.awayTeamId IN :ids")
     List<GameEntity> findByTeamIds(@Param("ids") List<UUID> teamIds);
