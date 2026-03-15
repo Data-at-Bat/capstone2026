@@ -42,4 +42,32 @@ public class TeamEntity {
     @Column(name="created_at")
     private LocalDateTime createdAt;
 
+    @Getter
+    @Setter
+    @Column(name="starting_pitcher")
+    private String startingPitcher;
+
+    @Getter
+    @Setter
+    @Column(name="wins_of_last_five")
+    private short winsOfLastFive;
+
+    @Getter
+    @Setter
+    @Column(name="pitcher_war")
+    private Double pitcherWar;
+
+    @Getter
+    @Setter
+    @Column(name="season_on_base_percentage")
+    private Double seasonOnBasePercentage;
+
+    @Getter
+    @Setter
+    @Column(name="last_five_on_base_percentage")
+    private Double lastFiveOnBasePercentage;
+
+    TeamEntity() {
+        createdAt = LocalDateTime.now();
+    }
 }

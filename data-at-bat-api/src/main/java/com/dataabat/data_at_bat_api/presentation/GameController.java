@@ -1,6 +1,7 @@
 package com.dataabat.data_at_bat_api.presentation;
 
 import com.dataabat.data_at_bat_api.domain.GameEntity;
+import com.dataabat.data_at_bat_api.presentation.presentation_models.GameResponse;
 import com.dataabat.data_at_bat_api.services.GameService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

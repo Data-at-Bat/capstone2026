@@ -4,7 +4,7 @@ import com.dataabat.data_at_bat_api.domain.GameEntity;
 import com.dataabat.data_at_bat_api.domain.TeamEntity;
 import com.dataabat.data_at_bat_api.persistence.repositories.IGamesRepository;
 import com.dataabat.data_at_bat_api.persistence.repositories.ITeamsRepository;
-import com.dataabat.data_at_bat_api.presentation.GameResponse;
+import com.dataabat.data_at_bat_api.presentation.presentation_models.GameResponse;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
