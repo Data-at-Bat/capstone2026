@@ -5,12 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="514ced99-57d4-4b85-b05c-aaf064f00e98" name="Changes" comment="add predictions">
+      <change afterPath="$PROJECT_DIR$/src/test/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/TeamEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/TeamEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/TeamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/TeamController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/Mapper.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/TeamController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/TeamController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/presentation_models/TeamModel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,7 +51,9 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Maven.data-at-bat-api [clean].executor": "Run",
     "Maven.data-at-bat-api [compile].executor": "Run",
+    "Maven.data-at-bat-api [install].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
@@ -67,7 +67,7 @@
     "Spring Boot.DataAtBatApiApplication.executor": "Run",
     "git-widget-placeholder": "teams-endpoint",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/chris/OneDrive/Desktop/Projects/capstone2026/data-at-bat-api",
+    "last_opened_file_path": "C:/Users/chris/OneDrive/Desktop/Projects/capstone2026/data-at-bat-api/src/test/resources",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.0",
@@ -84,6 +84,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\chris\OneDrive\Desktop\Projects\capstone2026\data-at-bat-api\src\test\resources" />
       <recent name="C:\Users\chris\OneDrive\Desktop\Projects\capstone2026\data-at-bat-api" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
