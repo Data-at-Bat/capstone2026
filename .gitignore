@@ -2,6 +2,6 @@
 .vscode
 *.pyc
 data-at-bat-api/.env
-
+data-at-bat-api/target/
 # data files
 ml-pipeline/data/processed/*.csv
