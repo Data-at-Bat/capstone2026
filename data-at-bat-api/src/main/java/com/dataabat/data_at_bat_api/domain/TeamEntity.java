@@ -67,5 +67,7 @@ public class TeamEntity {
     @Column(name="last_five_on_base_percentage")
     private Double lastFiveOnBasePercentage;
 
-
+    TeamEntity() {
+        createdAt = LocalDateTime.now();
+    }
 }

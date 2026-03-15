@@ -5,20 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="514ced99-57d4-4b85-b05c-aaf064f00e98" name="Changes" comment="add predictions">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/Mapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/TeamController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/presentation_models/TeamModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/Mapper.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/TeamController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/presentation_models/TeamModel.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/TeamEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/TeamEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/GameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/GameController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/GameResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/presentation_models/GameResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/PlaceholderController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/GameService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/GameService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/DataAtBatApiApplication.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/DataAtBatApiApplication.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/PlaceholderController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/TeamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/TeamController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/Mapper.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/TeamController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/TeamController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/dataabat/data_at_bat_api/presentation/presentation_models/TeamModel.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
