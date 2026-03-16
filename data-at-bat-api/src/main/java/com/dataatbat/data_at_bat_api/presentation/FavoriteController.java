@@ -1,6 +1,7 @@
 package com.dataatbat.data_at_bat_api.presentation;
 
 import com.dataatbat.data_at_bat_api.domain.FavoriteEntity;
+import com.dataatbat.data_at_bat_api.presentation.presentation_models.FavoritesResponse;
 import com.dataatbat.data_at_bat_api.services.FavoriteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
