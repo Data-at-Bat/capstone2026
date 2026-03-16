@@ -1,4 +1,4 @@
-package com.dataabat.data_at_bat_api.presentation.presentation_models;
+package com.dataatbat.data_at_bat_api.presentation.presentation_models;
 
 import java.time.LocalDateTime;
 import java.util.List;

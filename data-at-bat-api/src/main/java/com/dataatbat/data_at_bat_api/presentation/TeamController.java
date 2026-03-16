@@ -1,15 +1,10 @@
-package com.dataabat.data_at_bat_api.presentation;
+package com.dataatbat.data_at_bat_api.presentation;
 
-import com.dataabat.data_at_bat_api.domain.TeamEntity;
-import com.dataabat.data_at_bat_api.persistence.repositories.ITeamsRepository;
+import com.dataatbat.data_at_bat_api.domain.TeamEntity;
+import com.dataatbat.data_at_bat_api.persistence.repositories.ITeamsRepository;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 

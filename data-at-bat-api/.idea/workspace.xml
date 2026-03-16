@@ -5,10 +5,47 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="514ced99-57d4-4b85-b05c-aaf064f00e98" name="Changes" comment="add predictions">
-      <change afterPath="$PROJECT_DIR$/src/test/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/DataAtBatApiApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/domain/FavoriteEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/domain/GameEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/domain/PredictionEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/domain/TeamEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/domain/UserEntity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/persistence/repositories/IFavoritesRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/persistence/repositories/IGamesRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/persistence/repositories/IPredictionRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/persistence/repositories/ITeamsRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/persistence/repositories/IUserRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/FavoriteController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/FavoritesResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/GameController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/TeamController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/presentation_models/GameResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/services/FavoriteService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/services/GameService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/dataatbat/data_at_bat_api/DataAtBatApiApplicationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/DataAtBatApiApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/FavoriteEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/GameEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/PredictionEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/TeamEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/domain/UserEntity.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/repositories/IFavoritesRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/repositories/IGamesRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/repositories/IPredictionRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/repositories/ITeamsRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/persistence/repositories/IUserRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/FavoriteController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/FavoritesResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/GameController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/TeamController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/presentation/presentation_models/GameResponse.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/FavoriteService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataabat/data_at_bat_api/services/GameService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/dataabat/data_at_bat_api/DataAtBatApiApplicationTests.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +102,7 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.DataAtBatApiApplication.executor": "Run",
-    "git-widget-placeholder": "teams-endpoint",
+    "git-widget-placeholder": "update-teams-endpoint",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/chris/OneDrive/Desktop/Projects/capstone2026/data-at-bat-api/src/test/resources",
     "nodejs_package_manager_path": "npm",
@@ -97,7 +134,7 @@
   <component name="RunManager">
     <configuration name="DataAtBatApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
       <module name="data-at-bat-api" />
-      <option name="SPRING_BOOT_MAIN_CLASS" value="com.dataabat.data_at_bat_api.DataAtBatApiApplication" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.dataatbat.data_at_bat_api.DataAtBatApiApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

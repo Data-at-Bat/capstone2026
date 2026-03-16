@@ -1,6 +1,6 @@
-package com.dataabat.data_at_bat_api.persistence.repositories;
+package com.dataatbat.data_at_bat_api.persistence.repositories;
 
-import com.dataabat.data_at_bat_api.domain.UserEntity;
+import com.dataatbat.data_at_bat_api.domain.UserEntity;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -1,4 +1,4 @@
-package com.dataabat.data_at_bat_api.domain;
+package com.dataatbat.data_at_bat_api.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,17 +24,17 @@ public class TeamEntity {
 
     @Getter
     @Setter
-    @Column(length=10, nullable = false)
+    @Column(length=3, nullable = false)
     private String abbreviation;
 
     @Getter
     @Setter
-    @Column(length=10)
+    @Column(length=64)
     private String league;
 
     @Getter
     @Setter
-    @Column(length=50)
+    @Column(length=32)
     private String division;
 
     @Getter
@@ -66,6 +66,14 @@ public class TeamEntity {
     @Setter
     @Column(name="last_five_on_base_percentage")
     private Double lastFiveOnBasePercentage;
+
+    @Getter
+    @Setter
+    private int wins;
+
+    @Getter
+    @Setter
+    private int losses;
 
     TeamEntity() {
         createdAt = LocalDateTime.now();
