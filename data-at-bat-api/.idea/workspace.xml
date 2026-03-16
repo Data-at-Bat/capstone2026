@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="514ced99-57d4-4b85-b05c-aaf064f00e98" name="Changes" comment="add predictions">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/services/TeamService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/FavoriteController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/FavoriteController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/FavoritesResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/presentation_models/FavoritesResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/TeamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/dataatbat/data_at_bat_api/presentation/TeamController.java" afterDir="false" />
-    </list>
+    <list default="true" id="514ced99-57d4-4b85-b05c-aaf064f00e98" name="Changes" comment="add predictions" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

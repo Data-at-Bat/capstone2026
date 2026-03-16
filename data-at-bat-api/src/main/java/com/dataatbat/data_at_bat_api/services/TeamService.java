@@ -5,9 +5,9 @@ import com.dataatbat.data_at_bat_api.persistence.repositories.ITeamsRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.HashMap;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -66,7 +66,16 @@ public class TeamService {
     public ResponseEntity<String> updateSingleTeam(TeamEntity team) {
         try {
             assert team.getTeamId() != null;
-            repository.save(team);
+            Optional<TeamEntity> existing = repository.findById(team.getTeamId());
+
+            if (existing.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            TeamEntity newTeam = existing.get();
+            newTeam.partialUpdate(team);
+            repository.save(newTeam);
+
             return ResponseEntity.ok("Team updated successfully.");
         }
         catch (AssertionError error) {
@@ -82,11 +91,18 @@ public class TeamService {
 
     public ResponseEntity<String> updateTeamBatchRequest(Iterable<TeamEntity> teams) {
         try {
+            HashMap<UUID, TeamEntity> updates = new HashMap<UUID, TeamEntity>();
             for (TeamEntity team : teams) {
                 assert team.getTeamId() != null;
+                updates.put(team.getTeamId(), team);
             }
 
-            repository.saveAll(teams);
+            Iterable<TeamEntity> existingTeams = repository.findByTeamIdIn(updates.keySet());
+
+            for (TeamEntity existing : existingTeams) {
+                existing.partialUpdate(updates.get(existing.getTeamId()));
+            }
+            repository.saveAll(existingTeams);
             return ResponseEntity.ok("Teams updated successfully.");
         }
         catch (AssertionError error) {

@@ -8,20 +8,21 @@ import java.util.UUID;
 
 public interface ITeamsRepository extends CrudRepository<TeamEntity, UUID> {
     TeamEntity findByName(String name);
-    List<TeamEntity> findByNameIn(List<String> names);
+    Iterable<TeamEntity> findByNameIn(Iterable<String> names);
     TeamEntity findByAbbreviation(String abbreviation);
-    List<TeamEntity> findByAbbreviationIn(List<String> abbreviations);
-    List<TeamEntity> findByLeague(String league);
-    List<TeamEntity> findByLeagueIn(List<String> leagues);
-    List<TeamEntity> findByDivision(String division);
-    List<TeamEntity> findByDivisionIn(List<String> divisions);
+    Iterable<TeamEntity> findByAbbreviationIn(Iterable<String> abbreviations);
+    Iterable<TeamEntity> findByLeague(String league);
+    Iterable<TeamEntity> findByLeagueIn(Iterable<String> leagues);
+    Iterable<TeamEntity> findByDivision(String division);
+    Iterable<TeamEntity> findByDivisionIn(Iterable<String> divisions);
+    Iterable<TeamEntity> findByTeamIdIn(Iterable<UUID> teamIds);
 
     void deleteByName(String name);
-    void deleteByNameIn(List<String> names);
+    void deleteByNameIn(Iterable<String> names);
     void deleteByAbbreviation(String abbreviation);
-    void deleteByAbbreviationIn(List<String> abbreviations);
+    void deleteByAbbreviationIn(Iterable<String> abbreviations);
     void deleteByLeague(String league);
-    void deleteByLeagueIn(List<String> leagues);
+    void deleteByLeagueIn(Iterable<String> leagues);
     void deleteByDivision(String division);
-    void deleteByDivisionIn(List<String> divisions);
+    void deleteByDivisionIn(Iterable<String> divisions);
 }

@@ -50,7 +50,7 @@ public class TeamEntity {
     @Getter
     @Setter
     @Column(name="wins_of_last_five")
-    private short winsOfLastFive;
+    private Short winsOfLastFive;
 
     @Getter
     @Setter
@@ -69,13 +69,52 @@ public class TeamEntity {
 
     @Getter
     @Setter
-    private int wins;
+    private Integer wins;
 
     @Getter
     @Setter
-    private int losses;
+    private Integer losses;
 
     TeamEntity() {
         createdAt = LocalDateTime.now();
+    }
+
+    public void partialUpdate(TeamEntity team) {
+        if (team.getName() != null) {
+            setName(team.getName());
+        }
+        if (team.getAbbreviation() != null) {
+            setAbbreviation(team.getAbbreviation());
+        }
+        if (team.getLeague() != null) {
+            setLeague(team.getLeague());
+        }
+        if (team.getDivision() != null) {
+            setDivision(team.getDivision());
+        }
+        if (team.getCreatedAt() != null) {
+            setCreatedAt(team.getCreatedAt());
+        }
+        if (team.getStartingPitcher() != null) {
+            setStartingPitcher(team.getStartingPitcher());
+        }
+        if (team.getWinsOfLastFive() != null) {
+            setWinsOfLastFive(team.getWinsOfLastFive());
+        }
+        if (team.getPitcherWar() != null) {
+            setPitcherWar(team.getPitcherWar());
+        }
+        if (team.getSeasonOnBasePercentage() != null) {
+            setSeasonOnBasePercentage(team.getSeasonOnBasePercentage());
+        }
+        if (team.getLastFiveOnBasePercentage() != null) {
+            setLastFiveOnBasePercentage(team.getLastFiveOnBasePercentage());
+        }
+        if (team.getWins() != null) {
+            setWins(team.getWins());
+        }
+        if (team.getLosses() != null) {
+            setLosses(team.getLosses());
+        }
     }
 }
