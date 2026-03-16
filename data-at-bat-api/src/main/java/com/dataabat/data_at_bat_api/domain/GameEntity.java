@@ -62,4 +62,15 @@ public class GameEntity {
     @Getter
     @Setter
     private LocalDateTime gameFeaturesLastUpdated;
+    
+    public void partialUpdate(GameEntity game) {
+    if (game.getGameTime() != null) setGameTime(game.getGameTime());
+    if (game.getHomeTeamId() != null) setHomeTeamId(game.getHomeTeamId());
+    if (game.getAwayTeamId() != null) setAwayTeamId(game.getAwayTeamId());
+    if (game.getStatus() != null) setStatus(game.getStatus());
+    if (game.getFinalScoreHome() != null) setFinalScoreHome(game.getFinalScoreHome());
+    if (game.getFinalScoreAway() != null) setFinalScoreAway(game.getFinalScoreAway());
+    if (game.getGameFeatures() != null) setGameFeatures(game.getGameFeatures());
+    if (game.getGameFeaturesLastUpdated() != null) setGameFeaturesLastUpdated(game.getGameFeaturesLastUpdated());
+}
 }
