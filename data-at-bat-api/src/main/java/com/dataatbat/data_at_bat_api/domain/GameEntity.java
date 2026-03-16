@@ -1,4 +1,4 @@
-package com.dataabat.data_at_bat_api.domain;
+package com.dataatbat.data_at_bat_api.domain;
 
 import jakarta.persistence.*;
 import lombok.*;

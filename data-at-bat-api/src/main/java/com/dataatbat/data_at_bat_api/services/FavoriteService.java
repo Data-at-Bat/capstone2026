@@ -1,7 +1,7 @@
-package com.dataabat.data_at_bat_api.services;
+package com.dataatbat.data_at_bat_api.services;
 
-import com.dataabat.data_at_bat_api.domain.FavoriteEntity;
-import com.dataabat.data_at_bat_api.persistence.repositories.IFavoritesRepository;
+import com.dataatbat.data_at_bat_api.domain.FavoriteEntity;
+import com.dataatbat.data_at_bat_api.persistence.repositories.IFavoritesRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

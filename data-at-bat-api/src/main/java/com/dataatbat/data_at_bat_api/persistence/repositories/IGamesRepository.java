@@ -1,7 +1,6 @@
-package com.dataabat.data_at_bat_api.persistence.repositories;
+package com.dataatbat.data_at_bat_api.persistence.repositories;
 
-import com.dataabat.data_at_bat_api.domain.GameEntity;
-import jakarta.transaction.Transactional;
+import com.dataatbat.data_at_bat_api.domain.GameEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

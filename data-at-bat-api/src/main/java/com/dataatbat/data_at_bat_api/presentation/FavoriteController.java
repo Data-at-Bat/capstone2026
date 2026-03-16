@@ -1,11 +1,11 @@
-package com.dataabat.data_at_bat_api.presentation;
+package com.dataatbat.data_at_bat_api.presentation;
 
-import com.dataabat.data_at_bat_api.domain.FavoriteEntity;
-import com.dataabat.data_at_bat_api.services.FavoriteService;
+import com.dataatbat.data_at_bat_api.domain.FavoriteEntity;
+import com.dataatbat.data_at_bat_api.presentation.presentation_models.FavoritesResponse;
+import com.dataatbat.data_at_bat_api.services.FavoriteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.dataabat.data_at_bat_api.presentation.FavoritesResponse;
 
 import java.util.List;
 import java.util.UUID;
