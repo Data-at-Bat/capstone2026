@@ -4,8 +4,14 @@
 General file structure for the pipeline
 
 config/     # Settings, API keys, etc.
-data/       # API clients for MLB Stats
+data/       # All data related files
+fetch/      # Fetching data from APIs
 models/     # Trained models
 features/   # Feature engineering
-models/     # LightGBM training, inference
 analysis/   # evaluation, value bets?
+
+## How to run the pipeline
+
+```bash
+python pipeline.py --start-season 2015 --end-season 2024
+```

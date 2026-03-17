@@ -1,7 +1,9 @@
 import pandas as pd
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from config.team_mapping import MLB_NAME_TO_FG
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 RAW_DIR = os.path.join(BASE_DIR, "data", "raw")
 PROCESSED_DIR = os.path.join(BASE_DIR, "data", "processed")
@@ -28,6 +30,10 @@ def merge_data(schedule, results):
         how="inner"
     )
 
+    df["home_team_fg"] = df["home_team"].map(MLB_NAME_TO_FG)
+    df["away_team_fg"] = df["away_team"].map(MLB_NAME_TO_FG)
+    df["season"] = pd.to_datetime(df["date"]).dt.year
+
     return df
 
 
@@ -36,10 +42,13 @@ def clean_dataset(df):
     columns = [
         "game_id",
         "date",
+        "season",
         "home_team",
         "away_team",
         "home_team_id",
         "away_team_id",
+        "home_team_fg",
+        "away_team_fg",
         "home_pitcher_id",
         "away_pitcher_id",
         "home_score",
@@ -49,8 +58,8 @@ def clean_dataset(df):
 
     df = df[columns]
 
-    # Drop games missing critical info
-    df = df.dropna(subset=["home_score", "away_score"])
+    # Drop games missing critical info (scores or team mapping)
+    df = df.dropna(subset=["home_score", "away_score", "home_team_fg", "away_team_fg"])
 
     return df
 

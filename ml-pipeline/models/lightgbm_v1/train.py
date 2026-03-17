@@ -4,7 +4,7 @@ import os
 from sklearn.model_selection import train_test_split
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DATA_PATH = os.path.join(BASE_DIR, "data", "processed", "model_dataset.csv")
+DATA_PATH = os.path.join(BASE_DIR, "data", "processed", "unified_all.csv")
 
 
 def load_data():
@@ -14,16 +14,23 @@ def load_data():
 
 def prepare_features(df):
 
-    # Drop non-numeric and non-feature columns
-    X = df.drop(columns=[
+    drop_cols = [
         "game_id",
         "date",
+        "season",
         "home_team",
         "away_team",
+        "home_team_id",
+        "away_team_id",
+        "home_team_fg",
+        "away_team_fg",
+        "home_pitcher_id",
+        "away_pitcher_id",
         "home_score",
         "away_score",
-        "home_win"
-    ])
+        "home_win",
+    ]
+    X = df.drop(columns=[c for c in drop_cols if c in df.columns])
 
     y = df["home_win"]
 
@@ -49,16 +56,7 @@ def train():
         num_leaves=31
     )
 
-    model.fit(
-        X_train,
-        y_train,
-        categorical_feature=[
-            "home_team_id",
-            "away_team_id",
-            "home_pitcher_id",
-            "away_pitcher_id"
-        ]
-    )
+    model.fit(X_train, y_train)
 
     accuracy = model.score(X_test, y_test)
 

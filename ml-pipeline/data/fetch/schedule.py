@@ -45,11 +45,18 @@ def fetch_schedule(start_date: str, end_date: str) -> pd.DataFrame:
 
             game_id = game["gamePk"]
 
-            home_team = game["teams"]["home"]["team"]["name"]
-            away_team = game["teams"]["away"]["team"]["name"]
+            home_info = game["teams"]["home"]["team"]
+            away_info = game["teams"]["away"]["team"]
 
-            home_team_id = game["teams"]["home"]["team"]["id"]
-            away_team_id = game["teams"]["away"]["team"]["id"]
+            # Skip games with incomplete team info (All-Star, exhibitions)
+            if "name" not in home_info or "name" not in away_info:
+                continue
+
+            home_team = home_info["name"]
+            away_team = away_info["name"]
+
+            home_team_id = home_info["id"]
+            away_team_id = away_info["id"]
 
             status = game["status"]["detailedState"]
 
