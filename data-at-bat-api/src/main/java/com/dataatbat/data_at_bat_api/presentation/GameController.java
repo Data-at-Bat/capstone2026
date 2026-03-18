@@ -20,54 +20,51 @@ public class GameController {
         this.gameService = gameService;
     }
 
-    @GetMapping
+    @GetMapping(params = "!id")
     public ResponseEntity<List<GameResponse>> getGames(
             @RequestParam(required = false) LocalDateTime startDate,
             @RequestParam(required = false) LocalDateTime endDate,
             @RequestParam(required = false) List<UUID> teamIds) {
-        return ResponseEntity.ok(gameService.getGames(startDate, endDate, teamIds));
+        return gameService.getGames(startDate, endDate, teamIds);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<GameResponse> getGameById(@PathVariable UUID id) {
-        return gameService.getGameById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping(params = "id")
+    public ResponseEntity<GameResponse> getGameById(@RequestParam UUID id) {
+        return gameService.getGameById(id);
     }
 
-    @PostMapping
-    public ResponseEntity<GameEntity> createGame(@RequestBody CreateGameRequest request) {
-        GameEntity created = gameService.createGame(
-                request.gameTime(), request.homeTeamId(), request.awayTeamId(),
-                request.predictedWinner(), request.confidence(), request.spread(),
-                request.odds(), request.predictiveFactors());
-        return ResponseEntity.ok(created);
+    @PostMapping(params = "!batch")
+    public ResponseEntity<String> createGame(@RequestBody GameEntity game) {
+        return gameService.createSingleGame(game);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<GameEntity> updateGame(
-            @PathVariable UUID id,
-            @RequestBody UpdateGameRequest request) {
-        return gameService.updateGame(id, request.gameTime(), request.homeTeamId(), request.awayTeamId(),
-                request.predictedWinner(), request.confidence(), request.spread(),
-                request.odds(), request.predictiveFactors())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    @PostMapping(params = "batch=false")
+    public ResponseEntity<String> createGameBatchFalse(@RequestBody GameEntity game) {
+        return gameService.createSingleGame(game);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGame(@PathVariable UUID id) {
-        if (gameService.deleteGame(id)) return ResponseEntity.noContent().build();
-        return ResponseEntity.notFound().build();
+    @PostMapping(params = "batch=true")
+    public ResponseEntity<String> createGamesBatch(@RequestBody Iterable<GameEntity> games) {
+        return gameService.createGamesBatchRequest(games);
     }
 
-    public record CreateGameRequest(
-            LocalDateTime gameTime, UUID homeTeamId, UUID awayTeamId,
-            String predictedWinner, Double confidence, Double spread,
-            Double odds, List<String> predictiveFactors) {}
+    @PatchMapping(params = "!batch")
+    public ResponseEntity<String> updateGame(@RequestParam UUID id, @RequestBody GameEntity game) {
+        return gameService.updateSingleGame(id, game);
+    }
 
-    public record UpdateGameRequest(
-            LocalDateTime gameTime, UUID homeTeamId, UUID awayTeamId,
-            String predictedWinner, Double confidence, Double spread,
-            Double odds, List<String> predictiveFactors) {}
+    @PatchMapping(params = "batch=false")
+    public ResponseEntity<String> updateGameBatchFalse(@RequestParam UUID id, @RequestBody GameEntity game) {
+        return gameService.updateSingleGame(id, game);
+    }
+
+    @PatchMapping(params = "batch=true")
+    public ResponseEntity<String> updateGamesBatch(@RequestBody Iterable<GameEntity> games) {
+        return gameService.updateGamesBatchRequest(games);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteGame(@RequestParam UUID id) {
+        return gameService.deleteGame(id);
+    }
 }
