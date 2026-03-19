@@ -1,9 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../../../../models/game_matchup.dart';
+import '../../../../models/game_matchup.dart'; // Adjust path if needed
 
-class GameDetailScreen extends StatelessWidget { // Can now be a stateless widget!
-  final GameMatchup gameData; // Receives the full object
+class GameDetailScreen extends StatelessWidget {
+  final GameMatchup gameData;
   final String userId;
   final bool isPaidMember;
 
@@ -16,12 +16,15 @@ class GameDetailScreen extends StatelessWidget { // Can now be a stateless widge
 
   @override
   Widget build(BuildContext context) {
+    // Formatting the date nicely for the app bar
+    String formattedDate = "${gameData.gameTime.month}/${gameData.gameTime.day}/${gameData.gameTime.year}";
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Matchup Details: ${gameData.gameTime}'),
+        title: Text('Matchup: $formattedDate'),
         centerTitle: true,
       ),
-      body: _buildContent(gameData), 
+      body: _buildContent(gameData),
     );
   }
 
@@ -31,26 +34,22 @@ class GameDetailScreen extends StatelessWidget { // Can now be a stateless widge
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          // 1. Team Logos Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildTeamLogo(game.awayTeamAbbr),
+              _buildTeamLogo(game.awayTeamID),
               const Text('vs', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              _buildTeamLogo(game.homeTeamAbbr),
+              _buildTeamLogo(game.homeTeamID),
             ],
           ),
           const SizedBox(height: 30),
-          
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildStatsColumn('Away (${game.awayTeamAbbr})', game.awayStats),
-              _buildStatsColumn('Home (${game.homeTeamAbbr})', game.homeStats),
-            ],
-          ),
-          const SizedBox(height: 40),
 
+          // 2. Predictive Factors List
+          _buildPredictiveFactorsList(game.predictiveFactors),
+          const SizedBox(height: 30),
+
+          // 3. Prediction Card
           Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
@@ -60,12 +59,12 @@ class GameDetailScreen extends StatelessWidget { // Can now be a stateless widge
             child: Column(
               children: [
                 Text(
-                  'Predicted Winner: ${game.predictedWinner}',
+                  'Predicted Winner: ${game.predictedWinner ?? "TBD"}',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Win Probability: ${game.predictedProbability}%\nModel Confidence: ${game.confidencePrediction}%',
+                  'Model Confidence: ${game.confidence?.toStringAsFixed(1) ?? "--"}%\nSpread: ${game.spread != null ? (game.spread! > 0 ? "+${game.spread}" : game.spread.toString()) : "N/A"}',
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 16, height: 1.5),
                 ),
@@ -74,6 +73,7 @@ class GameDetailScreen extends StatelessWidget { // Can now be a stateless widge
           ),
           const SizedBox(height: 30),
 
+          // 4. Value Bet Premium Section
           _buildValueBetIndicator(isPaidMember, game),
         ],
       ),
@@ -106,27 +106,43 @@ class GameDetailScreen extends StatelessWidget { // Can now be a stateless widge
     );
   }
 
-  Widget _buildStatsColumn(String title, Map<String, String> stats) {
-    String statsText = stats.entries
-        .map((entry) => '${entry.key}: ${entry.value}')
-        .join('\n');
+  // Redesigned to handle the new List<String> format perfectly
+  Widget _buildPredictiveFactorsList(List<String>? factors) {
+    if (factors == null || factors.isEmpty) {
+      return const Text("No predictive factors available for this game yet.",
+          style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey));
+    }
 
-    return Expanded(
-      child: Column(
-        children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 12),
-          Text(
-            statsText,
-            textAlign: TextAlign.center,
-            style: const TextStyle(height: 1.5),
+    return Column(
+      children: [
+        const Text(
+            "Key Predictive Factors",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)
+        ),
+        const SizedBox(height: 12),
+        ...factors.map((factor) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("• ", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(factor, style: const TextStyle(fontSize: 16, height: 1.3)),
+              ),
+            ],
           ),
-        ],
-      ),
+        )),
+      ],
     );
   }
 
   Widget _buildValueBetIndicator(bool isPaidMember, GameMatchup game) {
+    // Safely format the odds (e.g., adding a "+" to positive numbers)
+    String formattedOdds = "N/A";
+    if (game.odds != null) {
+      formattedOdds = game.odds! > 0 ? "+${game.odds}" : game.odds.toString();
+    }
+
     Widget valueBetContent = Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -143,7 +159,7 @@ class GameDetailScreen extends StatelessWidget { // Can now be a stateless widge
           ),
           const SizedBox(height: 12),
           Text(
-            'Value Bet Differential: +${game.valueBet}',
+            'Model shows an edge on the current line.\nOdds: $formattedOdds',
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16, height: 1.5),
           ),

@@ -98,12 +98,22 @@ class GameListItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  _buildTeamDisplay(game.awayTeamName, game.awayTeamAbbr, const Color(0xFFED6A5A)), // Coral
+                  _buildTeamDisplay(
+                    // If awayTeamName is null, display the awayTeamId instead
+                      game.awayTeamName ?? "Unknown Away Team",
+                      game.awayTeamID,
+                      const Color(0xFFED6A5A)
+                  ), // Coral
                   const Text(
                     "AT",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.grey),
                   ),
-                  _buildTeamDisplay(game.homeTeamName, game.homeTeamAbbr, const Color(0xFF2374AB)), // Blue
+                  _buildTeamDisplay(
+                    // If homeTeamName is null, display the homeTeamId instead
+                      game.homeTeamName ?? "Unknown Home Team",
+                      game.homeTeamID,
+                      const Color(0xFF2374AB)
+                  ), // Blue
                 ],
               ),
               
