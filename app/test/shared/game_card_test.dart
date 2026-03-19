@@ -14,9 +14,9 @@ void main() {
   final mockGame = GameMatchup(
     gameId: '04b61be4-0d94-403d-aefb-ccaa1d404f99', // uuid in the db
     gameTime: DateTime.parse('2026-03-18 19:45:00'),
-    homeTeamID: 'STL',
+    homeTeamId: 'STL',
     homeTeamName: 'St. Louis Cardinals',
-    awayTeamID: 'CHC',
+    awayTeamId: 'CHC',
     awayTeamName: 'Chicago Cubs',
     predictedWinner: 'STL',
     confidence: 68.5,
