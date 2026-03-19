@@ -1,105 +1,183 @@
 import pandas as pd
 import numpy as np
+import math
 
-from features.team_stats import aggregate_batting, aggregate_pitching, build_team_features
+from features.team_stats import (
+    compute_cumulative_batting,
+    compute_cumulative_pitching,
+    build_team_features,
+)
 
 
-def _make_batting_df():
-    """Minimal batting DataFrame that mimics FanGraphs output."""
+def _make_batting_logs():
+    """5-game batting log for a single team with known values."""
     return pd.DataFrame([
-        {"Team": "NYY", "Season": 2024, "WAR": 5.0, "R": 100, "HR": 30,
-         "RBI": 90, "SB": 10, "BB": 50, "SO": 120, "PA": 600, "AB": 540,
-         "AVG": 0.280, "OBP": 0.350, "SLG": 0.500, "OPS": 0.850,
-         "wOBA": 0.370, "wRC+": 130},
-        {"Team": "NYY", "Season": 2024, "WAR": 3.0, "R": 80, "HR": 20,
-         "RBI": 70, "SB": 5, "BB": 40, "SO": 100, "PA": 500, "AB": 450,
-         "AVG": 0.260, "OBP": 0.330, "SLG": 0.450, "OPS": 0.780,
-         "wOBA": 0.340, "wRC+": 115},
-        {"Team": "- - -", "Season": 2024, "WAR": 1.0, "R": 20, "HR": 5,
-         "RBI": 15, "SB": 2, "BB": 10, "SO": 30, "PA": 100, "AB": 85,
-         "AVG": 0.250, "OBP": 0.310, "SLG": 0.400, "OPS": 0.710,
-         "wOBA": 0.310, "wRC+": 100},
-        {"Team": "BOS", "Season": 2024, "WAR": 4.0, "R": 90, "HR": 25,
-         "RBI": 80, "SB": 8, "BB": 45, "SO": 110, "PA": 550, "AB": 500,
-         "AVG": 0.270, "OBP": 0.340, "SLG": 0.480, "OPS": 0.820,
-         "wOBA": 0.360, "wRC+": 125},
+        {"Team": "NYY", "date": "2024-04-01", "game_id": 1,
+         "runs": 5, "hits": 10, "homeRuns": 2, "baseOnBalls": 3,
+         "strikeOuts": 8, "plateAppearances": 38, "atBats": 34,
+         "doubles": 2, "triples": 0, "rbi": 5, "stolenBases": 1,
+         "hitByPitch": 1},
+        {"Team": "NYY", "date": "2024-04-02", "game_id": 2,
+         "runs": 3, "hits": 7, "homeRuns": 1, "baseOnBalls": 2,
+         "strikeOuts": 10, "plateAppearances": 35, "atBats": 32,
+         "doubles": 1, "triples": 1, "rbi": 3, "stolenBases": 0,
+         "hitByPitch": 0},
+        {"Team": "NYY", "date": "2024-04-03", "game_id": 3,
+         "runs": 8, "hits": 14, "homeRuns": 3, "baseOnBalls": 5,
+         "strikeOuts": 6, "plateAppearances": 42, "atBats": 36,
+         "doubles": 3, "triples": 0, "rbi": 7, "stolenBases": 2,
+         "hitByPitch": 1},
+        {"Team": "NYY", "date": "2024-04-04", "game_id": 4,
+         "runs": 1, "hits": 4, "homeRuns": 0, "baseOnBalls": 1,
+         "strikeOuts": 12, "plateAppearances": 33, "atBats": 31,
+         "doubles": 0, "triples": 0, "rbi": 1, "stolenBases": 0,
+         "hitByPitch": 1},
+        {"Team": "NYY", "date": "2024-04-05", "game_id": 5,
+         "runs": 6, "hits": 11, "homeRuns": 2, "baseOnBalls": 4,
+         "strikeOuts": 7, "plateAppearances": 40, "atBats": 35,
+         "doubles": 2, "triples": 1, "rbi": 6, "stolenBases": 1,
+         "hitByPitch": 0},
     ])
 
 
-def _make_pitching_df():
-    """Minimal pitching DataFrame that mimics FanGraphs output."""
+def _make_pitching_logs():
+    """5-game pitching log for a single team with known values."""
     return pd.DataFrame([
-        {"Team": "NYY", "Season": 2024, "WAR": 4.0, "W": 12, "L": 5,
-         "SO": 180, "BB": 50, "HR": 15, "ER": 60, "IP": 180.0, "TBF": 730,
-         "ERA": 3.00, "FIP": 3.10, "WHIP": 1.10, "K/9": 9.0, "BB/9": 2.5,
-         "K%": 0.246, "BB%": 0.068},
-        {"Team": "NYY", "Season": 2024, "WAR": 2.0, "W": 8, "L": 6,
-         "SO": 120, "BB": 40, "HR": 12, "ER": 50, "IP": 140.0, "TBF": 580,
-         "ERA": 3.21, "FIP": 3.40, "WHIP": 1.15, "K/9": 7.7, "BB/9": 2.6,
-         "K%": 0.207, "BB%": 0.069},
-        {"Team": "- - -", "Season": 2024, "WAR": 0.5, "W": 2, "L": 1,
-         "SO": 30, "BB": 10, "HR": 3, "ER": 12, "IP": 30.0, "TBF": 130,
-         "ERA": 3.60, "FIP": 3.80, "WHIP": 1.20, "K/9": 9.0, "BB/9": 3.0,
-         "K%": 0.231, "BB%": 0.077},
-        {"Team": "BOS", "Season": 2024, "WAR": 3.5, "W": 10, "L": 7,
-         "SO": 150, "BB": 45, "HR": 14, "ER": 55, "IP": 160.0, "TBF": 660,
-         "ERA": 3.09, "FIP": 3.25, "WHIP": 1.12, "K/9": 8.4, "BB/9": 2.5,
-         "K%": 0.227, "BB%": 0.068},
+        {"Team": "NYY", "date": "2024-04-01", "game_id": 1,
+         "inningsPitched": 9.0, "hits": 6, "runs": 3, "earnedRuns": 2,
+         "baseOnBalls": 2, "strikeOuts": 10, "homeRuns": 1,
+         "battersFaced": 35},
+        {"Team": "NYY", "date": "2024-04-02", "game_id": 2,
+         "inningsPitched": 9.0, "hits": 8, "runs": 5, "earnedRuns": 4,
+         "baseOnBalls": 3, "strikeOuts": 7, "homeRuns": 2,
+         "battersFaced": 38},
+        {"Team": "NYY", "date": "2024-04-03", "game_id": 3,
+         "inningsPitched": 9.0, "hits": 4, "runs": 1, "earnedRuns": 1,
+         "baseOnBalls": 1, "strikeOuts": 12, "homeRuns": 0,
+         "battersFaced": 32},
+        {"Team": "NYY", "date": "2024-04-04", "game_id": 4,
+         "inningsPitched": 9.0, "hits": 10, "runs": 7, "earnedRuns": 6,
+         "baseOnBalls": 4, "strikeOuts": 5, "homeRuns": 3,
+         "battersFaced": 42},
+        {"Team": "NYY", "date": "2024-04-05", "game_id": 5,
+         "inningsPitched": 9.0, "hits": 7, "runs": 4, "earnedRuns": 3,
+         "baseOnBalls": 2, "strikeOuts": 8, "homeRuns": 1,
+         "battersFaced": 36},
     ])
 
 
-def test_aggregate_batting_excludes_traded():
-    df = aggregate_batting(_make_batting_df())
-    assert "- - -" not in df["Team"].values
+# ── Tests ────────────────────────────────────────────────────────────
+
+def test_first_game_batting_is_nan():
+    """First game of a season should have NaN cumulative batting features."""
+    df = compute_cumulative_batting(_make_batting_logs())
+    first = df.iloc[0]
+    assert math.isnan(first["batting_AVG"]), "First game should have NaN batting_AVG"
+    assert math.isnan(first["batting_OBP"]), "First game should have NaN batting_OBP"
 
 
-def test_aggregate_batting_sums():
-    df = aggregate_batting(_make_batting_df())
-    nyy = df[df["Team"] == "NYY"].iloc[0]
-    assert nyy["batting_PA"] == 1100  # 600 + 500
-    assert nyy["batting_HR"] == 50    # 30 + 20
+def test_first_game_pitching_is_nan():
+    """First game of a season should have NaN cumulative pitching features."""
+    df = compute_cumulative_pitching(_make_pitching_logs())
+    first = df.iloc[0]
+    assert math.isnan(first["pitching_ERA"]), "First game should have NaN pitching_ERA"
 
 
-def test_aggregate_batting_weighted_avg():
-    df = aggregate_batting(_make_batting_df())
-    nyy = df[df["Team"] == "NYY"].iloc[0]
-    # PA-weighted AVG: (0.280*600 + 0.260*500) / 1100
-    expected = (0.280 * 600 + 0.260 * 500) / 1100
-    assert abs(nyy["batting_AVG"] - expected) < 1e-6
+def test_no_future_leakage_batting():
+    """Game 3's batting features should only reflect games 1 and 2."""
+    df = compute_cumulative_batting(_make_batting_logs())
+    game3 = df[df["game_id"] == 3].iloc[0]
+
+    # Games 1+2: hits=10+7=17, atBats=34+32=66
+    expected_avg = 17 / 66
+    assert abs(game3["batting_AVG"] - expected_avg) < 1e-6, (
+        f"Game 3 AVG should be {expected_avg}, got {game3['batting_AVG']}"
+    )
 
 
-def test_aggregate_pitching_excludes_traded():
-    df = aggregate_pitching(_make_pitching_df())
-    assert "- - -" not in df["Team"].values
+def test_no_future_leakage_pitching():
+    """Game 3's pitching features should only reflect games 1 and 2."""
+    df = compute_cumulative_pitching(_make_pitching_logs())
+    game3 = df[df["game_id"] == 3].iloc[0]
+
+    # Games 1+2: earnedRuns=2+4=6, IP=9+9=18
+    expected_era = 9.0 * 6 / 18
+    assert abs(game3["pitching_ERA"] - expected_era) < 1e-6, (
+        f"Game 3 ERA should be {expected_era}, got {game3['pitching_ERA']}"
+    )
 
 
-def test_aggregate_pitching_sums():
-    df = aggregate_pitching(_make_pitching_df())
-    nyy = df[df["Team"] == "NYY"].iloc[0]
-    assert nyy["pitching_W"] == 20   # 12 + 8
-    assert nyy["pitching_SO"] == 300  # 180 + 120
+def test_cumulative_batting_avg_progression():
+    """Verify AVG accumulates correctly across games."""
+    df = compute_cumulative_batting(_make_batting_logs())
+
+    # Game 2: only sees game 1 → AVG = 10/34
+    game2 = df[df["game_id"] == 2].iloc[0]
+    assert abs(game2["batting_AVG"] - 10 / 34) < 1e-6
+
+    # Game 4: sees games 1-3 → AVG = (10+7+14)/(34+32+36) = 31/102
+    game4 = df[df["game_id"] == 4].iloc[0]
+    assert abs(game4["batting_AVG"] - 31 / 102) < 1e-6
 
 
-def test_aggregate_pitching_weighted_avg():
-    df = aggregate_pitching(_make_pitching_df())
-    nyy = df[df["Team"] == "NYY"].iloc[0]
-    # TBF-weighted ERA: (3.00*730 + 3.21*580) / 1310
-    expected = (3.00 * 730 + 3.21 * 580) / 1310
-    assert abs(nyy["pitching_ERA"] - expected) < 1e-6
+def test_cumulative_era_formula():
+    """Verify ERA = 9 * ΣER / ΣIP across cumulated games."""
+    df = compute_cumulative_pitching(_make_pitching_logs())
+
+    # Game 5: sees games 1-4
+    # ER: 2+4+1+6=13, IP: 36
+    game5 = df[df["game_id"] == 5].iloc[0]
+    expected = 9.0 * 13 / 36
+    assert abs(game5["pitching_ERA"] - expected) < 1e-6
 
 
-def test_build_team_features_teams():
-    batting = _make_batting_df()
-    pitching = _make_pitching_df()
-    df = build_team_features(batting, pitching)
-    teams = set(df["Team"].values)
-    assert teams == {"NYY", "BOS"}  # no "- - -"
+def test_cumulative_whip_formula():
+    """Verify WHIP = (ΣH + ΣBB) / ΣIP."""
+    df = compute_cumulative_pitching(_make_pitching_logs())
+
+    # Game 4: sees games 1-3
+    # H: 6+8+4=18, BB: 2+3+1=6, IP: 27
+    game4 = df[df["game_id"] == 4].iloc[0]
+    expected = (18 + 6) / 27
+    assert abs(game4["pitching_WHIP"] - expected) < 1e-6
+
+
+def test_build_team_features_drops_warmup():
+    """build_team_features should drop the first min_games games."""
+    bat = _make_batting_logs()
+    pit = _make_pitching_logs()
+
+    result = build_team_features(bat, pit, min_games=3)
+    # 5 games - 3 warm-up = 2 remaining
+    assert len(result) == 2
+    assert set(result["game_id"]) == {4, 5}
 
 
 def test_build_team_features_has_both_prefixes():
-    batting = _make_batting_df()
-    pitching = _make_pitching_df()
-    df = build_team_features(batting, pitching)
-    cols = df.columns.tolist()
+    """Combined features should have both batting_ and pitching_ columns."""
+    bat = _make_batting_logs()
+    pit = _make_pitching_logs()
+
+    result = build_team_features(bat, pit, min_games=0)
+    cols = result.columns.tolist()
     assert any(c.startswith("batting_") for c in cols)
     assert any(c.startswith("pitching_") for c in cols)
+
+
+def test_two_teams_independent():
+    """Cumulative stats for team A should not bleed into team B."""
+    bat_a = _make_batting_logs()
+    bat_b = _make_batting_logs().copy()
+    bat_b["Team"] = "BOS"
+    bat_b["runs"] = 0  # BOS scores 0 runs every game
+
+    combined = pd.concat([bat_a, bat_b], ignore_index=True)
+    df = compute_cumulative_batting(combined)
+
+    # NYY game 2 should still see game 1's 5 runs
+    nyy_g2 = df[(df["Team"] == "NYY") & (df["game_id"] == 2)].iloc[0]
+    assert abs(nyy_g2["batting_R_per_game"] - 5.0) < 1e-6
+
+    # BOS game 2 should see game 1's 0 runs
+    bos_g2 = df[(df["Team"] == "BOS") & (df["game_id"] == 2)].iloc[0]
+    assert abs(bos_g2["batting_R_per_game"] - 0.0) < 1e-6

@@ -1,79 +1,118 @@
-"""Aggregate player-season FanGraphs data into one row per team per season."""
-
 from __future__ import annotations
 
 import pandas as pd
 
 
-def aggregate_batting(batting_df: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate player batting stats to team-season level.
+# Batting: counting cols that get cumulatively summed
+_BAT_SUM = ["runs", "hits", "homeRuns", "baseOnBalls", "strikeOuts",
+            "plateAppearances", "atBats", "doubles", "triples",
+            "rbi", "stolenBases", "hitByPitch"]
 
-    Filters out traded-player combined lines (Team == "- - -"),
-    sums counting stats, and computes PA-weighted rate stats.
-    """
-    df = batting_df[batting_df["Team"] != "- - -"].copy()
-
-    sum_cols = ["WAR", "R", "HR", "RBI", "SB", "BB", "SO", "PA", "AB"]
-    wavg_cols = ["AVG", "OBP", "SLG", "OPS", "wOBA", "wRC+"]
-    weight_col = "PA"
-
-    grouped = df.groupby(["Team", "Season"])
-
-    sums = grouped[sum_cols].sum()
-
-    def _weighted_avg(group: pd.DataFrame) -> pd.Series:
-        w = group[weight_col]
-        total = w.sum()
-        if total == 0:
-            return pd.Series({c: 0.0 for c in wavg_cols})
-        return pd.Series({c: (group[c] * w).sum() / total for c in wavg_cols})
-
-    wavgs = grouped.apply(_weighted_avg, include_groups=False)
-
-    result = sums.join(wavgs)
-    result = result.rename(columns={c: f"batting_{c}" for c in result.columns})
-    return result.reset_index()
+# Pitching: counting cols that get cumulatively summed
+_PIT_SUM = ["inningsPitched", "hits", "runs", "earnedRuns",
+            "baseOnBalls", "strikeOuts", "homeRuns", "battersFaced"]
 
 
-def aggregate_pitching(pitching_df: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate player pitching stats to team-season level.
+def compute_cumulative_batting(game_logs: pd.DataFrame) -> pd.DataFrame:
+    """Compute cumulative batting stats **entering** each game."""
+    df = game_logs.sort_values(["Team", "date"]).copy()
 
-    Filters out traded-player combined lines, sums counting stats,
-    and computes TBF-weighted rate stats.
-    """
-    df = pitching_df[pitching_df["Team"] != "- - -"].copy()
+    grouped = df.groupby("Team")
 
-    sum_cols = ["WAR", "W", "L", "SO", "BB", "HR", "ER", "IP", "TBF"]
-    wavg_cols = ["ERA", "FIP", "WHIP", "K/9", "BB/9", "K%", "BB%"]
-    weight_col = "TBF"
+    # Cumulative sums, shifted by 1 so game N sees games 1..N-1
+    for col in _BAT_SUM:
+        df[f"cum_{col}"] = grouped[col].cumsum().groupby(df["Team"]).shift(1)
 
-    grouped = df.groupby(["Team", "Season"])
+    # Games played entering this game
+    df["cum_games"] = grouped.cumcount()
 
-    sums = grouped[sum_cols].sum()
+    # Derived rate stats from cumulative counting stats
+    df["batting_AVG"] = df["cum_hits"] / df["cum_atBats"]
+    df["batting_OBP"] = (
+        (df["cum_hits"] + df["cum_baseOnBalls"] + df["cum_hitByPitch"])
+        / df["cum_plateAppearances"]
+    )
+    tb = (df["cum_hits"]
+          + df["cum_doubles"]
+          + 2 * df["cum_triples"]
+          + 3 * df["cum_homeRuns"])
+    df["batting_SLG"] = tb / df["cum_atBats"]
+    df["batting_OPS"] = df["batting_OBP"] + df["batting_SLG"]
 
-    def _weighted_avg(group: pd.DataFrame) -> pd.Series:
-        w = group[weight_col]
-        total = w.sum()
-        if total == 0:
-            return pd.Series({c: 0.0 for c in wavg_cols})
-        return pd.Series({c: (group[c] * w).sum() / total for c in wavg_cols})
+    # Per-game averages for counting stats
+    safe_games = df["cum_games"].replace(0, float("nan"))
+    df["batting_R_per_game"] = df["cum_runs"] / safe_games
+    df["batting_HR_per_game"] = df["cum_homeRuns"] / safe_games
+    df["batting_BB_per_game"] = df["cum_baseOnBalls"] / safe_games
+    df["batting_SO_per_game"] = df["cum_strikeOuts"] / safe_games
+    df["batting_SB_per_game"] = df["cum_stolenBases"] / safe_games
 
-    wavgs = grouped.apply(_weighted_avg, include_groups=False)
+    # Strikeout & walk rates
+    df["batting_K_pct"] = df["cum_strikeOuts"] / df["cum_plateAppearances"]
+    df["batting_BB_pct"] = df["cum_baseOnBalls"] / df["cum_plateAppearances"]
 
-    result = sums.join(wavgs)
-    result = result.rename(columns={c: f"pitching_{c}" for c in result.columns})
-    return result.reset_index()
+    # Drop intermediate cumulative columns
+    df = df.drop(columns=[c for c in df.columns if c.startswith("cum_")])
+
+    return df
+
+
+def compute_cumulative_pitching(game_logs: pd.DataFrame) -> pd.DataFrame:
+    """Compute cumulative pitching stats **entering** each game."""
+    df = game_logs.sort_values(["Team", "date"]).copy()
+
+    grouped = df.groupby("Team")
+
+    for col in _PIT_SUM:
+        df[f"cum_{col}"] = grouped[col].cumsum().groupby(df["Team"]).shift(1)
+
+    df["cum_games"] = grouped.cumcount()
+
+    # Derived cumulative rate stats
+    safe_ip = df["cum_inningsPitched"].replace(0, float("nan"))
+
+    df["pitching_ERA"] = 9.0 * df["cum_earnedRuns"] / safe_ip
+    df["pitching_WHIP"] = (df["cum_hits"] + df["cum_baseOnBalls"]) / safe_ip
+    df["pitching_K_per_9"] = 9.0 * df["cum_strikeOuts"] / safe_ip
+    df["pitching_BB_per_9"] = 9.0 * df["cum_baseOnBalls"] / safe_ip
+    df["pitching_HR_per_9"] = 9.0 * df["cum_homeRuns"] / safe_ip
+    df["pitching_H_per_9"] = 9.0 * df["cum_hits"] / safe_ip
+
+    safe_bf = df["cum_battersFaced"].replace(0, float("nan"))
+    df["pitching_K_pct"] = df["cum_strikeOuts"] / safe_bf
+    df["pitching_BB_pct"] = df["cum_baseOnBalls"] / safe_bf
+
+    # Per-game averages
+    safe_games = df["cum_games"].replace(0, float("nan"))
+    df["pitching_R_per_game"] = df["cum_runs"] / safe_games
+    df["pitching_SO_per_game"] = df["cum_strikeOuts"] / safe_games
+
+    df = df.drop(columns=[c for c in df.columns if c.startswith("cum_")])
+
+    return df
 
 
 def build_team_features(
-    batting_df: pd.DataFrame,
-    pitching_df: pd.DataFrame,
+    batting_logs: pd.DataFrame,
+    pitching_logs: pd.DataFrame,
+    min_games: int = 10,
 ) -> pd.DataFrame:
-    """Build unified team-season feature table from raw player stats.
+    """Build unified per-game team features from game-level logs."""
+    bat = compute_cumulative_batting(batting_logs)
+    pit = compute_cumulative_pitching(pitching_logs)
 
-    Returns one row per team per season with all batting_ and pitching_ columns.
-    """
-    batting_agg = aggregate_batting(batting_df)
-    pitching_agg = aggregate_pitching(pitching_df)
+    # Keep only the feature columns from each
+    bat_feature_cols = [c for c in bat.columns if c.startswith("batting_")]
+    pit_feature_cols = [c for c in pit.columns if c.startswith("pitching_")]
 
-    return batting_agg.merge(pitching_agg, on=["Team", "Season"], how="outer")
+    bat_slim = bat[["Team", "date", "game_id"] + bat_feature_cols].copy()
+    pit_slim = pit[["Team", "date", "game_id"] + pit_feature_cols].copy()
+
+    merged = bat_slim.merge(pit_slim, on=["Team", "date", "game_id"], how="outer")
+
+    # Drop warm-up games where cumulative stats are unreliable
+    if min_games > 0:
+        game_num = merged.groupby("Team").cumcount()
+        merged = merged[game_num >= min_games].copy()
+
+    return merged
