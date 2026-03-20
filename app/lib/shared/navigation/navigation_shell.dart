@@ -19,12 +19,12 @@ class NavigationShell extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'My Subscription',
+            label: 'Settings & Subscription',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'Historical Accuracy',
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.history),
+          //   label: 'Historical Accuracy',
+          // ),
         ],
         currentIndex: navigationShell.currentIndex,
         onTap: (index) => navigationShell.goBranch(index),

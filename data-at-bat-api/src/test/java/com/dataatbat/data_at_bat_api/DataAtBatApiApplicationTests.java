@@ -1,4 +1,4 @@
-package com.dataabat.data_at_bat_api;
+package com.dataatbat.data_at_bat_api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -75,7 +75,13 @@ class GameListItem extends StatelessWidget {
             
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => GameDetailPage(game: game)),
+              MaterialPageRoute(
+                builder: (context) => GameDetailScreen(
+                  gameData: game, 
+                  userId: '', 
+                  isPaidMember: isPaid,
+                ),
+              ),
             );
           } catch (e) {
             LoggerService.logEvent(

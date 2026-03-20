@@ -2,6 +2,7 @@
 .vscode
 *.pyc
 data-at-bat-api/.env
+data-at-bat-api/target/
 data/raw/*
 data/processed/*
 

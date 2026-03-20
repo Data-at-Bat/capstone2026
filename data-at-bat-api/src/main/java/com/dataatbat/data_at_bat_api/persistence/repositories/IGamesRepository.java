@@ -1,7 +1,6 @@
-package com.dataabat.data_at_bat_api.persistence.repositories;
+package com.dataatbat.data_at_bat_api.persistence.repositories;
 
-import com.dataabat.data_at_bat_api.domain.GameEntity;
-import jakarta.transaction.Transactional;
+import com.dataatbat.data_at_bat_api.domain.GameEntity;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,6 +17,8 @@ public interface IGamesRepository extends CrudRepository<GameEntity, UUID> {
     List<GameEntity> findByStatusAndTeamId(@Param("status") String status, @Param("teamId") UUID teamId);
     List<GameEntity> findByStatusAndHomeTeamId(String status, UUID HomeTeamId);
     List<GameEntity> findByStatusAndAwayTeamId(String status, UUID AwayTeamId);
+    List<GameEntity> findByGameTimeBetweenOrderByGameTimeAsc(LocalDateTime startDate, LocalDateTime endDate);
+
 
     @Query("SELECT g FROM GameEntity g WHERE g.homeTeamId IN :ids OR g.awayTeamId IN :ids")
     List<GameEntity> findByTeamIds(@Param("ids") List<UUID> teamIds);
