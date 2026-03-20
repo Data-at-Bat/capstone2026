@@ -19,7 +19,7 @@ public class GameService {
         this.gamesRepository = gamesRepository;
     }
 
-    public ResponseEntity<List<GameResponse>> getGames(LocalDateTime startDate, LocalDateTime endDate, List<UUID> teamIds) {
+    public ResponseEntity<List<GameResponse>> getGames(LocalDateTime startDate, LocalDateTime endDate, List<String> teamIds) {
         if (startDate == null) startDate = LocalDateTime.now().minusMonths(1);
         if (endDate == null) endDate = LocalDateTime.now().plusWeeks(1);
 

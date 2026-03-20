@@ -1,3 +1,5 @@
+import 'dart:convert'; // <-- Required for jsonDecode
+
 class GameMatchup {
   final String gameId;
   final DateTime gameTime;
@@ -26,7 +28,26 @@ class GameMatchup {
   });
 
   factory GameMatchup.fromJson(Map<String, dynamic> json) {
+    // 1. Handle the new Stringified JSON array safely
+    List<String>? parsedFactors;
+    final factorsRaw = json['predictiveFactors'];
 
+    if (factorsRaw != null) {
+      if (factorsRaw is String) {
+        // If the backend sends a stringified array (e.g. "[\"factor 1\"]")
+        try {
+          final decodedList = jsonDecode(factorsRaw) as List;
+          parsedFactors = decodedList.map((e) => e.toString()).toList();
+        } catch (e) {
+          print('Failed to parse predictiveFactors string: $e');
+        }
+      } else if (factorsRaw is List) {
+        // If the backend sends a normal JSON array (e.g. ["factor 1"])
+        parsedFactors = factorsRaw.map((e) => e.toString()).toList();
+      }
+    }
+
+    // 2. Return the safely parsed object
     try {
       return GameMatchup(
         gameId: json['gameId'] as String,
@@ -39,11 +60,11 @@ class GameMatchup {
         confidence: (json['confidence'] as num?)?.toDouble(),
         spread: (json['spread'] as num?)?.toDouble(),
         odds: (json['odds'] as num?)?.toDouble(),
-        predictiveFactors: (json['predictiveFactors'] as List<dynamic>?)
-            ?.map((e) => e as String)
-            .toList(),
+        predictiveFactors: parsedFactors, // Use our newly parsed list!
       );
     } catch (e) {
+      print('!!! CRASH HAPPENED DURING PARSING !!!');
+      print('Error details: $e');
       rethrow;
     }
   }

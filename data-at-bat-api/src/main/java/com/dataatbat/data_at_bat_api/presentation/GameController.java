@@ -27,7 +27,7 @@ public class GameController {
             @RequestParam(required = false) LocalDateTime endDate,
             @RequestParam(required = false) List<String> teamIds) {
 
-        return ResponseEntity.ok(gameService.getGames(startDate, endDate, teamIds));
+        return gameService.getGames(startDate, endDate, teamIds);
     }
 
     @GetMapping(params = "id")
@@ -43,27 +43,6 @@ public class GameController {
     @PostMapping(params = "batch=false")
     public ResponseEntity<String> createGameBatchFalse(@RequestBody GameEntity game) {
         return gameService.createSingleGame(game);
-    @PostMapping
-    public ResponseEntity<GameEntity> createGame(@RequestBody CreateGameRequest request) {
-        GameEntity created = gameService.createGame(
-                request.gameTime(), request.homeTeamId(), request.awayTeamId(),
-                request.predictedWinner(), request.confidence(), request.spread(),
-                request.homeTeamName(), request.awayTeamName(),
-                request.odds(), request.predictiveFactors());
-        return ResponseEntity.ok(created);
-    }
-
-    @PatchMapping("/{id}")
-    public ResponseEntity<GameEntity> updateGame(
-            @PathVariable UUID id,
-            @RequestBody UpdateGameRequest request) {
-
-        return gameService.updateGame(id, request.gameTime(), request.homeTeamId(), request.awayTeamId(),
-                        request.predictedWinner(), request.confidence(), request.spread(),
-                        request.homeTeamName(), request.awayTeamName(),
-                        request.odds(), request.predictiveFactors())
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping(params = "batch=true")
@@ -86,19 +65,4 @@ public class GameController {
         return gameService.updateGamesBatchRequest(games);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteGame(@RequestParam UUID id) {
-        return gameService.deleteGame(id);
-    }
-    public record CreateGameRequest(
-            LocalDateTime gameTime, String homeTeamId, String awayTeamId,
-            String homeTeamName, String awayTeamName,
-            String predictedWinner, Double confidence, Double spread,
-            Double odds, List<String> predictiveFactors) {}
-
-    public record UpdateGameRequest(
-            LocalDateTime gameTime, String homeTeamId, String awayTeamId,
-            String homeTeamName, String awayTeamName,
-            String predictedWinner, Double confidence, Double spread,
-            Double odds, List<String> predictiveFactors) {}
 }
