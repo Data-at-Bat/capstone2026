@@ -6,7 +6,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,48 +18,37 @@ import java.util.UUID;
 public class GameEntity {
 
     @Id
-    @Column(name = "game_id")
-    @Getter
+    @Column(name = "GameID", nullable = false)
     private UUID gameId;
 
-    @Column(name = "game_time", nullable = false)
-    @Getter
-    @Setter
+    @Column(name = "GameTime", nullable = false)
     private LocalDateTime gameTime;
 
-    @Column(name = "home_team_id", nullable = false)
-    @Getter
-    @Setter
-    private UUID homeTeamId;
+    @Column(name = "HomeTeamID", nullable = false)
+    private String homeTeamId;
 
-    @Column(name = "away_team_id", nullable = false)
-    @Getter
-    @Setter
-    private UUID awayTeamId;
+    @Column(name = "HomeTeamName")
+    private String homeTeamName;
 
-    @Column(name = "status", length = 50)
-    @Getter
-    @Setter
-    private String status;
+    @Column(name = "AwayTeamID", nullable = false)
+    private String awayTeamId;
 
-    @Column(name = "final_score_home")
-    @Getter
-    @Setter
-    private Integer finalScoreHome;
+    @Column(name = "AwayTeamName")
+    private String awayTeamName;
 
-    @Column(name = "final_score_away")
-    @Getter
-    @Setter
-    private Integer finalScoreAway;
+    @Column(name = "PredictedWinner")
+    private String predictedWinner;
 
-    @Getter
-    @Setter
-    @Column(name="game_features", nullable = false)
+    @Column(name = "Confidence")
+    private Double confidence;
+
+    @Column(name = "Spread")
+    private Double spread;
+
+    @Column(name = "Odds")
+    private Double odds;
+
+    @Column(name="PredictiveFactors")
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, Object> gameFeatures;
-
-    @Column(name="game_features_last_updated")
-    @Getter
-    @Setter
-    private LocalDateTime gameFeaturesLastUpdated;
+    private List<String> predictiveFactors;
 }

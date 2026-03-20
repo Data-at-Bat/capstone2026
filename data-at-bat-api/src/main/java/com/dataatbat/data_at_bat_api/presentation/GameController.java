@@ -12,6 +12,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/games")
+@CrossOrigin(origins = "*")
 public class GameController {
 
     private final GameService gameService;
@@ -24,7 +25,8 @@ public class GameController {
     public ResponseEntity<List<GameResponse>> getGames(
             @RequestParam(required = false) LocalDateTime startDate,
             @RequestParam(required = false) LocalDateTime endDate,
-            @RequestParam(required = false) List<UUID> teamIds) {
+            @RequestParam(required = false) List<String> teamIds) {
+
         return ResponseEntity.ok(gameService.getGames(startDate, endDate, teamIds));
     }
 
@@ -40,6 +42,7 @@ public class GameController {
         GameEntity created = gameService.createGame(
                 request.gameTime(), request.homeTeamId(), request.awayTeamId(),
                 request.predictedWinner(), request.confidence(), request.spread(),
+                request.homeTeamName(), request.awayTeamName(),
                 request.odds(), request.predictiveFactors());
         return ResponseEntity.ok(created);
     }
@@ -48,9 +51,11 @@ public class GameController {
     public ResponseEntity<GameEntity> updateGame(
             @PathVariable UUID id,
             @RequestBody UpdateGameRequest request) {
+
         return gameService.updateGame(id, request.gameTime(), request.homeTeamId(), request.awayTeamId(),
-                request.predictedWinner(), request.confidence(), request.spread(),
-                request.odds(), request.predictiveFactors())
+                        request.predictedWinner(), request.confidence(), request.spread(),
+                        request.homeTeamName(), request.awayTeamName(),
+                        request.odds(), request.predictiveFactors())
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -62,12 +67,14 @@ public class GameController {
     }
 
     public record CreateGameRequest(
-            LocalDateTime gameTime, UUID homeTeamId, UUID awayTeamId,
+            LocalDateTime gameTime, String homeTeamId, String awayTeamId,
+            String homeTeamName, String awayTeamName,
             String predictedWinner, Double confidence, Double spread,
             Double odds, List<String> predictiveFactors) {}
 
     public record UpdateGameRequest(
-            LocalDateTime gameTime, UUID homeTeamId, UUID awayTeamId,
+            LocalDateTime gameTime, String homeTeamId, String awayTeamId,
+            String homeTeamName, String awayTeamName,
             String predictedWinner, Double confidence, Double spread,
             Double odds, List<String> predictiveFactors) {}
 }
