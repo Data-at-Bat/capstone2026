@@ -1,7 +1,6 @@
 package com.dataatbat.data_at_bat_api.presentation.presentation_models;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public record GameResponse(
@@ -15,5 +14,5 @@ public record GameResponse(
     Double confidence,
     Double spread,
     Double odds,
-    List<String> predictiveFactors
+    String predictiveFactors
 ) {}

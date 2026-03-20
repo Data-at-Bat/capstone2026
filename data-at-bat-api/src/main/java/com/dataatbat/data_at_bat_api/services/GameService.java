@@ -2,142 +2,134 @@ package com.dataatbat.data_at_bat_api.services;
 
 import com.dataatbat.data_at_bat_api.domain.GameEntity;
 import com.dataatbat.data_at_bat_api.persistence.repositories.IGamesRepository;
-import com.dataatbat.data_at_bat_api.persistence.repositories.ITeamsRepository;
 import com.dataatbat.data_at_bat_api.presentation.presentation_models.GameResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class GameService {
 
     private final IGamesRepository gamesRepository;
-    private final ITeamsRepository teamsRepository;
 
-    public GameService(IGamesRepository gamesRepository, ITeamsRepository teamsRepository) {
+    public GameService(IGamesRepository gamesRepository) {
         this.gamesRepository = gamesRepository;
-        this.teamsRepository = teamsRepository;
     }
 
-    public List<GameResponse> getGames(LocalDateTime startDate, LocalDateTime endDate, List<String> teamIds) {
+    public ResponseEntity<List<GameResponse>> getGames(LocalDateTime startDate, LocalDateTime endDate, List<UUID> teamIds) {
+        if (startDate == null) startDate = LocalDateTime.now().minusMonths(1);
+        if (endDate == null) endDate = LocalDateTime.now().plusWeeks(1);
+
+        List<GameEntity> games;
+        if (teamIds == null || teamIds.isEmpty()) {
+            games = gamesRepository.findByGameTimeBetweenOrderByGameTimeAsc(startDate, endDate);
+        } else {
+            games = gamesRepository.findByGameTimeAndTeamId(startDate, endDate, teamIds);
+        }
+        return ResponseEntity.ok(games.stream().map(this::toResponse).toList());
+    }
+
+    public ResponseEntity<GameResponse> getGameById(UUID id) {
+        return gamesRepository.findById(id)
+                .map(this::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    public ResponseEntity<String> createSingleGame(GameEntity game) {
         try {
-            assert startDate != null;
-            assert endDate != null;
-
-            startDate = LocalDateTime.now().minusMonths(1);
-            endDate = LocalDateTime.now().plusWeeks(1);
-
-            List<GameEntity> games;
-            if (teamIds == null || teamIds.isEmpty()) {
-                games = gamesRepository.findByGameTimeBetweenOrderByGameTimeAsc(startDate, endDate);
-            } else {
-                games = gamesRepository.findByGameTimeAndTeamId(startDate, endDate, teamIds);
-            }
-            return games.stream().map(this::toResponse).toList();
-            }
-        catch (AssertionError error) {
-                throw error;
-            }
-    }
-
-    public Optional<GameResponse> getGameById(UUID id) {
-        return gamesRepository.findById(id).map(this::toResponse);
-    }
-
-    public GameEntity createGame(LocalDateTime gameTime, String homeTeamId, String awayTeamId,
-                                 String predictedWinner, Double confidence, Double spread, String homeTeamName, String awayTeamName,
-                                 Double odds, List<String> predictiveFactors) {
-
-        GameEntity game = GameEntity.builder()
-                .gameId(UUID.randomUUID())
-                .gameTime(gameTime)
-                .homeTeamId(homeTeamId)
-                .homeTeamName(homeTeamName)
-                .awayTeamId(awayTeamId)
-                .awayTeamName(awayTeamName)
-                .predictedWinner(predictedWinner)
-                .confidence(confidence)
-                .spread(spread)
-                .odds(odds)
-                .predictiveFactors(predictiveFactors)
-                .build();
-
-        return gamesRepository.save(game);
-    }
-
-    public Optional<GameEntity> updateGame(UUID id, LocalDateTime gameTime, String homeTeamId, String awayTeamId,
-                                           String predictedWinner, Double confidence, Double spread, String homeTeamName, String awayTeamName,
-                                           Double odds, List<String> predictiveFactors) {
-        Optional<GameEntity> existing = gamesRepository.findById(id);
-        if (existing.isEmpty()) return Optional.empty();
-
-        GameEntity game = existing.get();
-
-        try {
-            assert (gameTime != null);
-            assert (homeTeamId != null);
-            assert (awayTeamId != null);
-            assert (homeTeamName != null);
-            assert (awayTeamName != null);
-            assert (predictedWinner != null);
-            assert (confidence != null);
-            assert (spread != null);
-            assert (odds != null);
-            assert (predictiveFactors != null);
-
-            game.setGameTime(gameTime);
-            game.setHomeTeamId(homeTeamId);
-            game.setAwayTeamId(awayTeamId);
-            game.setHomeTeamName(homeTeamName);
-            game.setAwayTeamName(awayTeamName);
-            game.setPredictedWinner(predictedWinner);
-            game.setConfidence(confidence);
-            game.setSpread(spread);
-            game.setOdds(odds);
-            game.setPredictiveFactors(predictiveFactors);
-
-
-            return Optional.of(gamesRepository.save(game));
-        } catch (AssertionError error) {
-            throw error;
+            assert game.getGameId() == null;
+            game.setGameId(UUID.randomUUID());
+            GameEntity saved = gamesRepository.save(game);
+            return ResponseEntity.ok(saved.getGameId().toString());
+        } catch (AssertionError e) {
+            return ResponseEntity.badRequest().body("Cannot specify ID when creating a game.");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body("One or more fields could not be inserted. Ensure all required fields are present.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 
-    public boolean deleteGame(UUID id) {
+    public ResponseEntity<String> createGamesBatchRequest(Iterable<GameEntity> games) {
         try {
-            assert gamesRepository.existsById(id);
-            gamesRepository.deleteById(id);
-            return true;
-
-        } catch(AssertionError error) {
-            throw error;
+            for (GameEntity game : games) {
+                assert game.getGameId() == null;
+                game.setGameId(UUID.randomUUID());
+            }
+            gamesRepository.saveAll(games);
+            return ResponseEntity.ok("Games created successfully.");
+        } catch (AssertionError e) {
+            return ResponseEntity.badRequest().body("Cannot specify ID when creating a game.");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body("One or more fields could not be inserted. Ensure all required fields are present.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
+    }
+
+    public ResponseEntity<String> updateSingleGame(UUID id, GameEntity game) {
+        try {
+            assert id != null;
+            Optional<GameEntity> existing = gamesRepository.findById(id);
+            if (existing.isEmpty()) return ResponseEntity.notFound().build();
+            GameEntity existingGame = existing.get();
+            existingGame.partialUpdate(game);
+            gamesRepository.save(existingGame);
+            return ResponseEntity.ok("Game updated successfully.");
+        } catch (AssertionError e) {
+            return ResponseEntity.badRequest().body("Must specify ID when updating a game.");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body("One or more fields could not be updated.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    public ResponseEntity<String> updateGamesBatchRequest(Iterable<GameEntity> games) {
+        try {
+            HashMap<UUID, GameEntity> updates = new HashMap<>();
+            for (GameEntity game : games) {
+                assert game.getGameId() != null;
+                updates.put(game.getGameId(), game);
+            }
+            Iterable<GameEntity> existingGames = gamesRepository.findAllById(updates.keySet());
+            for (GameEntity existing : existingGames) {
+                existing.partialUpdate(updates.get(existing.getGameId()));
+            }
+            gamesRepository.saveAll(existingGames);
+            return ResponseEntity.ok("Games updated successfully.");
+        } catch (AssertionError e) {
+            return ResponseEntity.badRequest().body("Must specify ID when updating a game.");
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.badRequest().body(e.getLocalizedMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    public ResponseEntity<Void> deleteGame(UUID id) {
+        if (!gamesRepository.existsById(id)) return ResponseEntity.notFound().build();
+        gamesRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
     private GameResponse toResponse(GameEntity game) {
-        try  {
-            assert game != null;
-
-            return new GameResponse(
-                    game.getGameId(),
-                    game.getGameTime(),
-                    game.getHomeTeamName(),
-                    game.getHomeTeamId(),
-                    game.getAwayTeamName(),
-                    game.getAwayTeamId(),
-                    game.getPredictedWinner(),
-                    game.getConfidence(),
-                    game.getSpread(),
-                    game.getOdds(),
-                    game.getPredictiveFactors()
-            );
-        } catch (AssertionError error) {
-            throw error;
-        }
+        return new GameResponse(
+                game.getGameId(),
+                game.getGameTime(),
+                game.getHomeTeamName(),
+                game.getHomeTeamId(),
+                game.getAwayTeamName(),
+                game.getAwayTeamId(),
+                game.getPredictedWinner(),
+                game.getConfidence(),
+                game.getSpread(),
+                game.getOdds(),
+                game.getPredictiveFactors()
+        );
     }
 }
