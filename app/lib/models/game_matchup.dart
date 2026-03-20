@@ -28,7 +28,6 @@ class GameMatchup {
   });
 
   factory GameMatchup.fromJson(Map<String, dynamic> json) {
-    // 1. Handle the new Stringified JSON array safely
     List<String>? parsedFactors;
     final factorsRaw = json['predictiveFactors'];
 
@@ -47,7 +46,7 @@ class GameMatchup {
       }
     }
 
-    // 2. Return the safely parsed object
+    // Return the safely parsed object
     try {
       return GameMatchup(
         gameId: json['gameId'] as String,
@@ -60,11 +59,9 @@ class GameMatchup {
         confidence: (json['confidence'] as num?)?.toDouble(),
         spread: (json['spread'] as num?)?.toDouble(),
         odds: (json['odds'] as num?)?.toDouble(),
-        predictiveFactors: parsedFactors, // Use our newly parsed list!
+        predictiveFactors: parsedFactors,
       );
     } catch (e) {
-      print('!!! CRASH HAPPENED DURING PARSING !!!');
-      print('Error details: $e');
       rethrow;
     }
   }
