@@ -10,18 +10,18 @@ class MockGameRepository extends Mock implements GameRepository {}
 void main() {
   late MockGameRepository mockRepo;
 
-  // This is our perfect mock game based on the updated backend schema
+  // Perfect mock game aligned with your backend and the specific test assertions
   final mockGame = GameMatchup(
-    gameId: '04b61be4-0d94-403d-aefb-ccaa1d404f99', // uuid in the db
+    gameId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
     gameTime: DateTime.parse('2026-03-18 19:45:00'),
     homeTeamId: 'STL',
-    homeTeamName: 'St. Louis Cardinals',
+    homeTeamName: 'Cardinals',
     awayTeamId: 'CHC',
-    awayTeamName: 'Chicago Cubs',
+    awayTeamName: 'Cubs',
     predictedWinner: 'STL',
-    confidence: 68.5,
-    odds: -130.0,
-    spread: -1.5,
+    confidence: 80.0,
+    odds: 150.0,
+    spread: -2.0,
     predictiveFactors: ['Strong offense', 'Weak opponent pitching'],
   );
 
@@ -32,7 +32,6 @@ void main() {
   group('Daily Predictions Page Tests', () {
 
     testWidgets('Renders empty state when no games are returned', (tester) async {
-      // Tell the mock repository to return an empty list
       when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => []);
 
       await tester.pumpWidget(MaterialApp(
@@ -41,7 +40,8 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Start Time:'), findsNothing);
+      // Asserts the exact empty state text from your updated UI
+      expect(find.text('No games found for today.'), findsOneWidget);
     });
 
     testWidgets('Renders game cards successfully', (tester) async {
@@ -53,7 +53,7 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Verify that the team abbreviations (or names) actually rendered on the screen
+      // Verify the team abbreviations render on the main list cards
       expect(find.text('STL'), findsWidgets);
       expect(find.text('CHC'), findsWidgets);
     });
@@ -62,21 +62,32 @@ void main() {
       when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => [mockGame]);
 
       await tester.pumpWidget(MaterialApp(
-        home: DailyPredictionsPage(repository: mockRepo), // Note: Ensure this passes userId/isPaidMember down to the DetailScreen
+        home: DailyPredictionsPage(repository: mockRepo),
       ));
 
-      // Wait for the FutureBuilder to finish its mock fetch and build the list
       await tester.pumpAndSettle();
 
-      // Find the card/InkWell and tap it
+      // Tap the card to trigger navigation
       await tester.tap(find.byType(InkWell).first);
 
-      // Wait for the Navigator.push page transition animation to finish
+      // Wait for the Navigator.push page transition to finish
       await tester.pumpAndSettle();
 
-      // Verify the specific text from our updated GameDetailScreen is present
-      expect(find.textContaining('Predicted Winner: STL'), findsOneWidget);
-      expect(find.textContaining('Model Confidence: 68.5%'), findsOneWidget);
+      // --- UI ASSERTIONS FOR THE PREMIUM DETAIL SCREEN ---
+
+      // Check the Model Pick Banner
+      expect(find.text('Model Pick: '), findsOneWidget);
+      expect(find.text('STL'), findsWidgets); // findsWidgets because STL is also in the top card
+
+      // Check the Stat Badges
+      expect(find.text('80.0%'), findsOneWidget);
+      expect(find.textContaining('-2'), findsOneWidget);
+
+      // Check the Predictive Factors list
+      expect(find.text('Strong offense'), findsOneWidget);
+
+      // Check the Premium lock indicator for unpaid users
+      expect(find.text('Unlock Value Bets'), findsOneWidget);
     });
   });
 }
