@@ -12,7 +12,7 @@ from pybaseball import (
 )
 
 # Configuration
-PROCESSED_DIR = Path(__file__).resolve().parent / "processed"
+PROCESSED_DIR = Path(__file__).resolve().parent.parent / "processed"
 PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
 
 cache.enable()
