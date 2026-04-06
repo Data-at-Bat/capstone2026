@@ -76,7 +76,7 @@ class GameDetailScreen extends StatelessWidget {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
         title: Text(
-          'Game Time: ${gameData.gameTime.hour}:${gameData.gameTime.minute}',
+          'Game Time: ${gameData.gameTime.minute} minute of the ${gameData.gameTime.hour} hour',
           style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w700),
         ),
         centerTitle: true,

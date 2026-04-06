@@ -38,7 +38,7 @@ class GameMatchup {
           final decodedList = jsonDecode(factorsRaw) as List;
           parsedFactors = decodedList.map((e) => e.toString()).toList();
         } catch (e) {
-          print('Failed to parse predictiveFactors string: $e');
+          rethrow;
         }
       } else if (factorsRaw is List) {
         // If the backend sends a normal JSON array (e.g. ["factor 1"])
