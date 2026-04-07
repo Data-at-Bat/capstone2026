@@ -8,6 +8,7 @@ import pandas as pd
 from data.fetch.schedule import fetch_schedule
 from data.fetch.game_results import fetch_game_results
 from data.fetch.game_logs import fetch_all_team_logs
+from data.fetch.pitcher_stats import fetch_pitcher_season_stats
 from data.build_dataset import merge_data, clean_dataset
 from features.team_stats import build_team_features
 
@@ -71,6 +72,27 @@ def build_season(season: int, min_games: int = 10) -> pd.DataFrame:
         right_on=["Team", "date", "game_id"],
         how="inner",
     ).drop(columns=["Team"])
+
+    # Pitcher features: join prior-season stats
+    pitcher_ids = (
+        pd.concat([games["home_pitcher_id"], games["away_pitcher_id"]])
+        .dropna().astype(int).unique().tolist()
+    )
+    if pitcher_ids:
+        print(f"Fetching prior-season pitcher stats ({season - 1})...")
+        pitcher_stats = fetch_pitcher_season_stats(pitcher_ids, season - 1)
+
+        home_cols = {c: f"home_{c}" for c in pitcher_stats.columns if c != "pitcher_id"}
+        games = games.merge(
+            pitcher_stats.rename(columns=home_cols),
+            left_on="home_pitcher_id", right_on="pitcher_id", how="left",
+        ).drop(columns=["pitcher_id"])
+
+        away_cols = {c: f"away_{c}" for c in pitcher_stats.columns if c != "pitcher_id"}
+        games = games.merge(
+            pitcher_stats.rename(columns=away_cols),
+            left_on="away_pitcher_id", right_on="pitcher_id", how="left",
+        ).drop(columns=["pitcher_id"])
 
     print(f"  Final shape: {games.shape}")
     return games

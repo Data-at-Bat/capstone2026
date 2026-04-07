@@ -12,6 +12,11 @@ _BAT_SUM = ["runs", "hits", "homeRuns", "baseOnBalls", "strikeOuts",
 _PIT_SUM = ["inningsPitched", "hits", "runs", "earnedRuns",
             "baseOnBalls", "strikeOuts", "homeRuns", "battersFaced"]
 
+# Subsets needed to derive rolling rate stats
+_BAT_ROLL_SUM = ["runs", "hits", "homeRuns", "baseOnBalls",
+                 "plateAppearances", "atBats", "doubles", "triples", "hitByPitch"]
+_PIT_ROLL_SUM = ["inningsPitched", "hits", "earnedRuns", "baseOnBalls"]
+
 
 def compute_cumulative_batting(game_logs: pd.DataFrame) -> pd.DataFrame:
     """Compute cumulative batting stats **entering** each game."""
@@ -92,12 +97,68 @@ def compute_cumulative_pitching(game_logs: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def compute_rolling_batting(game_logs: pd.DataFrame, window: int) -> pd.DataFrame:
+    """Compute rolling batting stats over the last `window` games, entering each game."""
+    df = game_logs.sort_values(["Team", "date"]).copy()
+    tag = f"r{window}_"
+
+    def _roll(x):
+        return x.shift(1).rolling(window, min_periods=1).sum()
+
+    for col in _BAT_ROLL_SUM:
+        df[f"roll_{col}"] = df.groupby("Team")[col].transform(_roll)
+
+    # Number of games in the rolling window (for per-game denominators)
+    df["roll_count"] = df.groupby("Team")["runs"].transform(
+        lambda x: x.shift(1).rolling(window, min_periods=1).count()
+    )
+
+    safe_pa = df["roll_plateAppearances"].replace(0, float("nan"))
+    safe_ab = df["roll_atBats"].replace(0, float("nan"))
+    safe_count = df["roll_count"].replace(0, float("nan"))
+
+    df[f"batting_{tag}OBP"] = (
+        (df["roll_hits"] + df["roll_baseOnBalls"] + df["roll_hitByPitch"]) / safe_pa
+    )
+    tb = df["roll_hits"] + df["roll_doubles"] + 2 * df["roll_triples"] + 3 * df["roll_homeRuns"]
+    df[f"batting_{tag}SLG"] = tb / safe_ab
+    df[f"batting_{tag}OPS"] = df[f"batting_{tag}OBP"] + df[f"batting_{tag}SLG"]
+    df[f"batting_{tag}R_per_game"] = df["roll_runs"] / safe_count
+
+    df = df.drop(columns=[c for c in df.columns if c.startswith("roll_")])
+    return df
+
+
+def compute_rolling_pitching(game_logs: pd.DataFrame, window: int) -> pd.DataFrame:
+    """Compute rolling pitching stats over the last `window` games, entering each game."""
+    df = game_logs.sort_values(["Team", "date"]).copy()
+    tag = f"r{window}_"
+
+    def _roll(x):
+        return x.shift(1).rolling(window, min_periods=1).sum()
+
+    for col in _PIT_ROLL_SUM:
+        df[f"roll_{col}"] = df.groupby("Team")[col].transform(_roll)
+
+    safe_ip = df["roll_inningsPitched"].replace(0, float("nan"))
+
+    df[f"pitching_{tag}ERA"] = 9.0 * df["roll_earnedRuns"] / safe_ip
+    df[f"pitching_{tag}WHIP"] = (df["roll_hits"] + df["roll_baseOnBalls"]) / safe_ip
+
+    df = df.drop(columns=[c for c in df.columns if c.startswith("roll_")])
+    return df
+
+
 def build_team_features(
     batting_logs: pd.DataFrame,
     pitching_logs: pd.DataFrame,
     min_games: int = 10,
+    rolling_windows: list[int] | None = None,
 ) -> pd.DataFrame:
     """Build unified per-game team features from game-level logs."""
+    if rolling_windows is None:
+        rolling_windows = [10, 30]
+
     bat = compute_cumulative_batting(batting_logs)
     pit = compute_cumulative_pitching(pitching_logs)
 
@@ -109,6 +170,23 @@ def build_team_features(
     pit_slim = pit[["Team", "date", "game_id"] + pit_feature_cols].copy()
 
     merged = bat_slim.merge(pit_slim, on=["Team", "date", "game_id"], how="outer")
+
+    # Rolling windows
+    for w in rolling_windows:
+        roll_bat = compute_rolling_batting(batting_logs, w)
+        roll_pit = compute_rolling_pitching(pitching_logs, w)
+
+        roll_bat_cols = [c for c in roll_bat.columns if c.startswith("batting_")]
+        roll_pit_cols = [c for c in roll_pit.columns if c.startswith("pitching_")]
+
+        merged = merged.merge(
+            roll_bat[["Team", "date", "game_id"] + roll_bat_cols],
+            on=["Team", "date", "game_id"], how="left",
+        )
+        merged = merged.merge(
+            roll_pit[["Team", "date", "game_id"] + roll_pit_cols],
+            on=["Team", "date", "game_id"], how="left",
+        )
 
     # Drop warm-up games where cumulative stats are unreliable
     if min_games > 0:
