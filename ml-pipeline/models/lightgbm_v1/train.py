@@ -1,10 +1,13 @@
 import pandas as pd
 import lightgbm as lgb
 import os
+import joblib
+import json
 from sklearn.metrics import accuracy_score, log_loss
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DATA_PATH = os.path.join(BASE_DIR, "data", "processed", "unified_all.csv")
+MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Config
 TRAIN_END_SEASON = 2022   # Train on seasons <= this year
@@ -12,34 +15,23 @@ TEST_START_SEASON = 2023  # Test on seasons >= this year
 
 # Columns that are identifiers or labels — not features
 DROP_COLS = [
-    "game_id",
-    "date",
-    "season",
-    "home_team",
-    "away_team",
-    "home_team_id",
-    "away_team_id",
-    "home_team_fg",
-    "away_team_fg",
-    "home_pitcher_id",
-    "away_pitcher_id",
-    "home_score",
-    "away_score",
-    "home_win",
+    "game_id", "date", "season", "home_team", "away_team",
+    "home_team_id", "away_team_id", "home_team_fg", "away_team_fg",
+    "home_pitcher_id", "away_pitcher_id", "home_score", "away_score", "home_win"
 ]
-
 
 def load_data():
     df = pd.read_csv(DATA_PATH)
     df["date"] = pd.to_datetime(df["date"])
     return df
 
-
 def prepare_features(df):
+    # Drop known identifiers
     X = df.drop(columns=[c for c in DROP_COLS if c in df.columns])
+    # Safeguard: Drop any accidental string columns (like pitcher names) that break LightGBM
+    X = X.select_dtypes(exclude=['object'])
     y = df["home_win"]
     return X, y
-
 
 def train():
     df = load_data()
@@ -77,16 +69,17 @@ def train():
     print(f"\nAccuracy: {acc:.4f}")
     print(f"Log-loss: {ll:.4f}")
 
-    # Feature importance
-    importances = pd.Series(
-        model.feature_importances_, index=X_train.columns
-    ).sort_values(ascending=False)
-    print(f"\nTop 10 features:")
-    for feat, imp in importances.head(10).items():
-        print(f"  {feat:40s} {imp}")
+    # Save the Model and Feature List
+    model_path = os.path.join(MODEL_DIR, "lgbm_model.joblib")
+    joblib.dump(model, model_path)
+    print(f"\nModel successfully saved to: {model_path}")
+
+    features_path = os.path.join(MODEL_DIR, "model_features.json")
+    with open(features_path, "w") as f:
+        json.dump(list(X_train.columns), f)
+    print(f"Feature list successfully saved to: {features_path}")
 
     return model
-
 
 if __name__ == "__main__":
     model = train()
