@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:app/models/game_matchup.dart';
-import 'package:app/repositories/game_repository.dart';
+import 'package:app/features/daily_predictions/presentation/providers/prediction_provider.dart';
+import 'package:app/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:app/shared/logging/logger_service.dart';
 import 'package:app/features/daily_predictions/presentation/screens/game_detail_screen.dart';
 
-class DailyPredictionsPage extends StatelessWidget {
-  final GameRepository repository;
-
-  const DailyPredictionsPage({super.key, required this.repository});
+class DailyPredictionsPage extends ConsumerWidget {
+  const DailyPredictionsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,6 @@ class DailyPredictionsPage extends StatelessWidget {
           if (games.isEmpty) {
             return const Center(child: Text("No games found for today.", style: TextStyle(fontSize: 16, color: Colors.grey)));
           }
-
           return ListView.builder(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             itemCount: games.length,
@@ -45,6 +44,10 @@ class DailyPredictionsPage extends StatelessWidget {
             ),
           );
         },
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: Color(0xFF462255)),
+        ),
+        error: (err, stack) => Center(child: Text("Error: $err")),
       ),
     );
   }

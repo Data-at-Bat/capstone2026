@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/game_matchup.dart';
+import 'package:app/models/game_matchup.dart';
 
 class GameRepository {
 

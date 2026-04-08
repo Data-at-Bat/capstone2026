@@ -1,16 +1,54 @@
-# app
+# Data at Bat - MLB Predictions & Analytics
 
-A new Flutter project.
+Data at Bat is a Flutter application providing MLB game predictions.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (latest stable version)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Service Integrations
+
+The app currently uses **Mock Repositories** for local development and testing.
+
+### Current Features
+
+- **Daily Predictions:** View daily MLB game matchups.
+- **My Subscription:** View subscription status (mocked).
+- **Historical Accuracy:** View historical prediction performance.
+
+---
+
+## Testing Procedures
+
+### Unit & Widget Tests
+
+Fast tests that verify individual components and UI behavior using `mocktail` and `flutter_riverpod` overrides.
+
+- No external dependencies required.
+- Uses `MockSubscriptionRepository` and `PredictionRepository` (mock mode).
+
+---
+
+## Example Commands
+
+### Run Unit and Widget Tests
+
+```bash
+flutter test
+```
+
+### Build for Production (iOS)
+
+```bash
+flutter build ios --release
+```
+
+### Build for Production (Android)
+
+```bash
+flutter build appbundle --release
+```

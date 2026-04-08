@@ -1,16 +1,18 @@
-import 'package:app/app/app.dart';
-import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
-import 'package:app/features/subscription/presentation/screens/settings_screen.dart';
+import 'package:app/main.dart';
+import 'package:app/features/historical_accuracy/presentation/screens/historical_accuracy_screen.dart';
+import 'package:app/features/subscription/presentation/screens/my_subscription_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-// import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   testWidgets('NavigationShell displays pages and navigates correctly', (
     WidgetTester tester,
   ) async {
     // Build app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+    // Wrap with ProviderScope because MyApp uses Riverpod
+    await tester.pumpWidget(const ProviderScope(child: MyApp()));
+    await tester.pumpAndSettle();
 
     // Verify that the default page is DailyPredictionsPage.
     expect(find.byType(DailyPredictionsPage), findsOneWidget);
@@ -25,8 +27,8 @@ void main() {
     expect(find.byType(SettingsPage), findsOneWidget);
 
 
-    // Tap the 'Daily Predictions' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.list_alt));
+    // Go back to Subscription
+    await tester.tap(find.byIcon(Icons.person));
     await tester.pumpAndSettle();
 
     // Verify that DailyPredictionsPage is displayed again.

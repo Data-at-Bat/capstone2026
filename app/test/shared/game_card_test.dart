@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app/models/game_matchup.dart';
-import 'package:app/repositories/game_repository.dart';
+import 'package:app/features/daily_predictions/data/repositories/prediction_repository.dart';
+import 'package:app/features/daily_predictions/presentation/providers/prediction_provider.dart';
+import 'package:app/features/subscription/presentation/providers/subscription_provider.dart';
 import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
 
-class MockGameRepository extends Mock implements GameRepository {}
+class MockPredictionRepository extends Mock implements PredictionRepository {}
 
 void main() {
-  late MockGameRepository mockRepo;
+  late MockPredictionRepository mockRepo;
 
   // Perfect mock game aligned with your backend and the specific test assertions
   final mockGame = GameMatchup(
@@ -31,7 +34,7 @@ void main() {
       );
 
   setUp(() {
-    mockRepo = MockGameRepository();
+    mockRepo = MockPredictionRepository();
   });
 
   group('Daily Predictions Page Tests', () {
@@ -66,11 +69,19 @@ void main() {
     testWidgets('Behavioral: Tapping game card navigates to detail view', (tester) async {
       when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => [mockGame]);
 
-      await tester.pumpWidget(MaterialApp(
-        home: DailyPredictionsPage(repository: mockRepo),
-      ));
-
-      await tester.pumpAndSettle();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          predictionRepositoryProvider.overrideWithValue(mockRepo),
+          // Assume user is subscribed to avoid redirection for simplicity
+          subscriptionStateProvider.overrideWith((ref) => Stream.value(true)),
+        ],
+        child: const MaterialApp(
+          home: DailyPredictionsPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
 
       // Tap the card to trigger navigation
       await tester.tap(find.byType(InkWell).first);

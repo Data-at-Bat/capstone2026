@@ -1,12 +1,17 @@
 import 'package:app/shared/router/router.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   group('AppRouter', () {
     test('contains all the required routes', () {
-      final route = AppRouter.router.configuration.routes.first;
+      final container = ProviderContainer();
+      final router = container.read(routerProvider);
+      
+      final route = router.configuration.routes.firstWhere((r) => r is StatefulShellRoute);
       expect(route, isA<StatefulShellRoute>());
+      
       final shellRoute = route as StatefulShellRoute;
       final paths = shellRoute.branches
           .expand((branch) => branch.routes)
