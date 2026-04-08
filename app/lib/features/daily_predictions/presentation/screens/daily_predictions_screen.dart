@@ -7,8 +7,6 @@ import 'package:app/features/daily_predictions/presentation/screens/game_detail_
 
 class DailyPredictionsPage extends StatelessWidget {
   final GameRepository repository;
-  // Placeholder: set to 'true' to test the paid view with value bet badges.
-  final bool isUserPaid = false;
 
   const DailyPredictionsPage({super.key, required this.repository});
 
@@ -44,7 +42,6 @@ class DailyPredictionsPage extends StatelessWidget {
             itemCount: games.length,
             itemBuilder: (context, index) => GameListItem(
               game: games[index],
-              isPaid: isUserPaid,
             ),
           );
         },
@@ -55,57 +52,69 @@ class DailyPredictionsPage extends StatelessWidget {
 
 class GameListItem extends StatelessWidget {
   final GameMatchup game;
-  final bool isPaid;
 
-  const GameListItem({super.key, required this.game, required this.isPaid});
+  const GameListItem({super.key, required this.game});
+
+  // Translates MLB API Numeric IDs to your abbreviations
+  String _getAbbreviation(String teamId) {
+    const Map<String, String> idMap = {
+      '108': 'LAA', '109': 'ARI', '110': 'BAL', '111': 'BOS', '112': 'CHC',
+      '113': 'CIN', '114': 'CLE', '115': 'COL', '116': 'DET', '117': 'HOU',
+      '118': 'KC',  '119': 'LAD', '120': 'WSH', '121': 'NYM', '133': 'OAK',
+      '134': 'PIT', '135': 'SD',  '136': 'SEA', '137': 'SF',  '138': 'STL',
+      '139': 'TB',  '140': 'TEX', '141': 'TOR', '142': 'MIN', '143': 'PHI',
+      '144': 'ATL', '145': 'CWS', '146': 'MIA', '147': 'NYY', '158': 'MIL',
+    };
+    return idMap[teamId] ?? teamId; // Fallback to the ID if not found
+  }
 
   // Reused from Detail Screen for cohesive design
-  Color _getTeamColor(String teamId) {
-    switch (teamId.toUpperCase()) {
+  Color _getTeamColor(String teamAbbr) {
+    switch (teamAbbr.toUpperCase()) {
     // --- AL EAST ---
-      case 'BAL': return const Color(0xFFDF4601); // Orioles Orange
-      case 'BOS': return const Color(0xFFBD3039); // Red Sox Red
-      case 'NYY': return const Color(0xFF003087); // Yankees Navy
-      case 'TB':  return const Color(0xFF092C5C); // Rays Navy
-      case 'TOR': return const Color(0xFF134A8E); // Blue Jays Blue
+      case 'BAL': return const Color(0xFFDF4601);
+      case 'BOS': return const Color(0xFFBD3039);
+      case 'NYY': return const Color(0xFF003087);
+      case 'TB':  return const Color(0xFF092C5C);
+      case 'TOR': return const Color(0xFF134A8E);
 
     // --- AL CENTRAL ---
-      case 'CWS': return const Color(0xFF27251F); // White Sox Black
-      case 'CLE': return const Color(0xFFE31937); // Guardians Red
-      case 'DET': return const Color(0xFF0C2340); // Tigers Navy
-      case 'KC':  return const Color(0xFF004687); // Royals Blue
-      case 'MIN': return const Color(0xFF002B5C); // Twins Navy
+      case 'CWS': return const Color(0xFF27251F);
+      case 'CLE': return const Color(0xFFE31937);
+      case 'DET': return const Color(0xFF0C2340);
+      case 'KC':  return const Color(0xFF004687);
+      case 'MIN': return const Color(0xFF002B5C);
 
     // --- AL WEST ---
-      case 'HOU': return const Color(0xFFEB6E1F); // Astros Orange
-      case 'LAA': return const Color(0xFFBA0021); // Angels Red
-      case 'OAK': return const Color(0xFF003831); // Athletics Green
-      case 'SEA': return const Color(0xFF005C5C); // Mariners Northwest Green
-      case 'TEX': return const Color(0xFF003278); // Rangers Blue
+      case 'HOU': return const Color(0xFFEB6E1F);
+      case 'LAA': return const Color(0xFFBA0021);
+      case 'OAK': return const Color(0xFF003831);
+      case 'SEA': return const Color(0xFF005C5C);
+      case 'TEX': return const Color(0xFF003278);
 
     // --- NL EAST ---
-      case 'ATL': return const Color(0xFFCE1141); // Braves Red
-      case 'MIA': return const Color(0xFF00A3E0); // Marlins Blue
-      case 'NYM': return const Color(0xFFFF5910); // Mets Orange
-      case 'PHI': return const Color(0xFFE81828); // Phillies Red
-      case 'WSH': return const Color(0xFFAB0003); // Nationals Red
+      case 'ATL': return const Color(0xFFCE1141);
+      case 'MIA': return const Color(0xFF00A3E0);
+      case 'NYM': return const Color(0xFFFF5910);
+      case 'PHI': return const Color(0xFFE81828);
+      case 'WSH': return const Color(0xFFAB0003);
 
     // --- NL CENTRAL ---
-      case 'CHC': return const Color(0xFF0E3386); // Cubs Blue
-      case 'CIN': return const Color(0xFFC6011F); // Reds Red
-      case 'MIL': return const Color(0xFF12284B); // Brewers Navy
-      case 'PIT': return const Color(0xFFFDB827); // Pirates Gold
-      case 'STL': return const Color(0xFFC41E3A); // Cardinals Red
+      case 'CHC': return const Color(0xFF0E3386);
+      case 'CIN': return const Color(0xFFC6011F);
+      case 'MIL': return const Color(0xFF12284B);
+      case 'PIT': return const Color(0xFFFDB827);
+      case 'STL': return const Color(0xFFC41E3A);
 
     // --- NL WEST ---
-      case 'ARI': return const Color(0xFFA71930); // Diamondbacks Sedona Red
-      case 'COL': return const Color(0xFF33006F); // Rockies Purple
-      case 'LAD': return const Color(0xFF005A9C); // Dodgers Blue
-      case 'SD':  return const Color(0xFF2F241D); // Padres Brown
-      case 'SF':  return const Color(0xFFFD5A1E); // Giants Orange
+      case 'ARI': return const Color(0xFFA71930);
+      case 'COL': return const Color(0xFF33006F);
+      case 'LAD': return const Color(0xFF005A9C);
+      case 'SD':  return const Color(0xFF2F241D);
+      case 'SF':  return const Color(0xFFFD5A1E);
 
     // --- FALLBACK ---
-      default: return Colors.blueGrey;            // Unknown/Fallback
+      default: return Colors.blueGrey;
     }
   }
 
@@ -113,11 +122,12 @@ class GameListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final String formattedTime = DateFormat.jm().format(game.gameTime);
 
-    // Hidden Value Bet Logic for Paid users (needed for comparison)
+    // FIX: Removed the redundant '!= null' checks since these are non-nullable doubles
     // If odds are positive (e.g. +110), the model is picking an underdog = Value Bet!
-    bool isTrueValueBet = game.odds != null && game.odds! > 0;
+    bool isTrueValueBet = game.odds > 0;
+
     // If confidence is high AND it's an underdog, it's a LARGE value bet
-    bool isTrueLargeValue = isTrueValueBet && game.confidence != null && game.confidence! >= 65.0;
+    bool isTrueLargeValue = isTrueValueBet && game.confidence >= 65.0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -145,7 +155,6 @@ class GameListItem extends StatelessWidget {
                   builder: (context) => GameDetailScreen(
                     gameData: game,
                     userId: '',
-                    isPaidMember: isPaid,
                   ),
                 ),
               );
@@ -188,9 +197,11 @@ class GameListItem extends StatelessWidget {
                   ],
                 ),
 
-                // value Bet Indicator (MODIFIED LOGIC)
-                const SizedBox(height: 24),
-                _buildValueBetArea(isValueBetFound: isTrueValueBet, isLargeEdge: isTrueLargeValue),
+                // Value Bet Indicator
+                if (isTrueValueBet) ...[
+                  const SizedBox(height: 24),
+                  _buildValueBetArea(isLargeEdge: isTrueLargeValue),
+                ]
               ],
             ),
           ),
@@ -200,7 +211,9 @@ class GameListItem extends StatelessWidget {
   }
 
   Widget _buildTeamDisplay(String teamId, String? teamName) {
-    Color teamColor = _getTeamColor(teamId);
+    // Translate the numeric ID to the abbreviation (e.g., "138" -> "STL")
+    String teamAbbr = _getAbbreviation(teamId);
+    Color teamColor = _getTeamColor(teamAbbr);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -219,16 +232,16 @@ class GameListItem extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Image.asset(
-              'assets/logos/$teamId.png',
+              'assets/logos/$teamAbbr.png', // Request the abbreviation format
               fit: BoxFit.contain,
               errorBuilder: (context, error, stackTrace) =>
-                  Center(child: Text(teamId, style: TextStyle(fontWeight: FontWeight.bold, color: teamColor))),
+                  Center(child: Text(teamAbbr, style: TextStyle(fontWeight: FontWeight.bold, color: teamColor))),
             ),
           ),
         ),
         const SizedBox(height: 10),
         Text(
-          teamId,
+          teamAbbr, // Display abbreviation instead of numeric ID
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: Colors.black87),
         ),
         if (teamName != null)
@@ -243,38 +256,8 @@ class GameListItem extends StatelessWidget {
     );
   }
 
-  // Refactored method to handle the universal lock and specific paid badges
-  Widget _buildValueBetArea({required bool isValueBetFound, required bool isLargeEdge}) {
-    // If the user hasn't paid, universally show the lock for every game.
-    if (!isPaid) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade100, // Very neutral grey background
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.lock, size: 16, color: Colors.black87),
-            const SizedBox(width: 6),
-            Text(
-              "Premium Edge Locked",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[800]),
-            ),
-          ],
-        ),
-      );
-    }
-
-    // Paid User View: Only build a badge if a value bet is actually found.
-    if (!isValueBetFound) {
-      return const SizedBox.shrink(); // Hide area if no value bet edge is detected for paid user
-    }
-
-    // specific styled badges for paid users
+  // Refactored method: No more locks. Only displays if a value bet is found.
+  Widget _buildValueBetArea({required bool isLargeEdge}) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 10),

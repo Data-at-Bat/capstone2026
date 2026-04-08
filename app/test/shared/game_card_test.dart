@@ -12,18 +12,23 @@ void main() {
 
   // Perfect mock game aligned with your backend and the specific test assertions
   final mockGame = GameMatchup(
-    gameId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-    gameTime: DateTime.parse('2026-03-18 19:45:00'),
-    homeTeamId: 'STL',
-    homeTeamName: 'Cardinals',
-    awayTeamId: 'CHC',
-    awayTeamName: 'Cubs',
-    predictedWinner: 'STL',
-    confidence: 80.0,
-    odds: 150.0,
-    spread: -2.0,
-    predictiveFactors: ['Strong offense', 'Weak opponent pitching'],
-  );
+        gameId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        gameTime: DateTime.now().add(const Duration(hours: 2)),
+        homeTeamName: 'St. Louis Cardinals',
+        awayTeamName: 'Chicago Cubs',
+        homeTeamId: '138',
+        awayTeamId: '112',
+        predictedWinner: 'St. Louis Cardinals',
+        confidence: 80.0,
+        odds: 150.0,
+        spread: -2.0,
+        predictiveFactors: {
+          'home_ops': 0.768,
+          'away_ops': 0.636,
+          'home_pitching_era': 3.53,
+          'away_pitching_era': 4.71
+        },
+      );
 
   setUp(() {
     mockRepo = MockGameRepository();
@@ -84,7 +89,7 @@ void main() {
       expect(find.textContaining('-2'), findsOneWidget);
 
       // Check the Predictive Factors list
-      expect(find.text('Strong offense'), findsOneWidget);
+      expect(find.text('home_pitching_era'), findsOneWidget);
 
       // Check the Premium lock indicator for unpaid users
       expect(find.text('Unlock Value Bets'), findsOneWidget);
