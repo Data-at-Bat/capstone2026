@@ -47,30 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDljZ56hmn106dRcm-nHI3G7S6MzTmcPuI',
-    appId: '1:858207127190:web:d3ce6293c3eb8d0ce064b7',
-    messagingSenderId: '858207127190',
+    apiKey: String.fromEnvironment('WEB_API_KEY'),
+    appId: String.fromEnvironment('WEB_APP_ID'),
+    messagingSenderId: String.fromEnvironment('MESSAGING_SENDER_ID'),
     projectId: 'data-at-bat',
     authDomain: 'data-at-bat.firebaseapp.com',
     storageBucket: 'data-at-bat.firebasestorage.app',
-    measurementId: 'G-95K34F1WYX',
+    measurementId: String.fromEnvironment('WEB_MEASUREMENT_ID'),
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCOaZhLujuztwbCzidm8l_g2eoFQZ9IJNk',
-    appId: '1:858207127190:android:8d79c25c4d982a07e064b7',
-    messagingSenderId: '858207127190',
+    apiKey: String.fromEnvironment('ANDROID_API_KEY'),
+    appId: String.fromEnvironment('ANDROID_APP_ID'),
+    messagingSenderId: String.fromEnvironment('MESSAGING_SENDER_ID'),
     projectId: 'data-at-bat',
     storageBucket: 'data-at-bat.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCa5medzvA_mi5cHQVHxg8yApP_JTRDR6w',
-    appId: '1:858207127190:ios:69e246107718ac84e064b7',
-    messagingSenderId: '858207127190',
+    apiKey: String.fromEnvironment('IOS_API_KEY'),
+    appId: String.fromEnvironment('IOS_APP_ID'),
+    messagingSenderId: String.fromEnvironment('MESSAGING_SENDER_ID'),
     projectId: 'data-at-bat',
     storageBucket: 'data-at-bat.firebasestorage.app',
-    iosClientId: '858207127190-hh385vivrl4ma5t5gfp63nkkbt973ima.apps.googleusercontent.com',
-    iosBundleId: 'com.example.app',
+    iosClientId: String.fromEnvironment('IOS_CLIENT_ID'),
+    iosBundleId: 'com.example.app', // Update this if you have a real bundle ID
   );
 }
