@@ -1,0 +1,103 @@
+commence_time,home_team,away_team,bookmaker,team,price,odds_date,game_id,date,home_team_id,away_team_id,home_pitcher_id,home_pitcher_name,away_pitcher_id,away_pitcher_name,status,schedule_date,date_diff_days
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,BetMGM,Cincinnati Reds,135,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,BetMGM,Miami Marlins,-170,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,BetRivers,Cincinnati Reds,125,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,BetRivers,Miami Marlins,-175,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,Bovada,Cincinnati Reds,165,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,Bovada,Miami Marlins,-220,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,DraftKings,Cincinnati Reds,133,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,DraftKings,Miami Marlins,-174,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,FanDuel,Cincinnati Reds,128,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,FanDuel,Miami Marlins,-164,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,MyBookie.ag,Cincinnati Reds,150,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 16:11:00+00:00,Miami Marlins,Cincinnati Reds,MyBookie.ag,Miami Marlins,-200,2026-04-09,823884,2026-04-09,146,113,676974.0,Max Meyer,695076.0,Rhett Lowder,In Progress,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,BetMGM,Athletics,165,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,BetMGM,New York Yankees,-200,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,BetOnline.ag,Athletics,169,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,BetOnline.ag,New York Yankees,-188,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,BetRivers,Athletics,165,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,BetRivers,New York Yankees,-215,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,BetUS,Athletics,165,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,BetUS,New York Yankees,-188,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,Bovada,Athletics,162,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,Bovada,New York Yankees,-197,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,DraftKings,Athletics,159,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,DraftKings,New York Yankees,-194,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,FanDuel,Athletics,158,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,FanDuel,New York Yankees,-188,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,LowVig.ag,Athletics,169,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,LowVig.ag,New York Yankees,-188,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,MyBookie.ag,Athletics,162,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:36:00+00:00,New York Yankees,Oakland Athletics,MyBookie.ag,New York Yankees,-192,2026-04-09,823565,2026-04-09,147,133,677960.0,Ryan Weathers,605488.0,Jeffrey Springs,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,BetMGM,Detroit Tigers,-130,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,BetMGM,Minnesota Twins,120,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,BetOnline.ag,Detroit Tigers,-132,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,BetOnline.ag,Minnesota Twins,120,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,BetRivers,Detroit Tigers,-137,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,BetRivers,Minnesota Twins,112,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,BetUS,Detroit Tigers,-130,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,BetUS,Minnesota Twins,118,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,Bovada,Detroit Tigers,-133,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,Bovada,Minnesota Twins,111,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,DraftKings,Detroit Tigers,-136,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,DraftKings,Minnesota Twins,113,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,FanDuel,Detroit Tigers,-132,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,FanDuel,Minnesota Twins,112,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,LowVig.ag,Detroit Tigers,-132,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,LowVig.ag,Minnesota Twins,120,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,MyBookie.ag,Detroit Tigers,-133,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 17:41:00+00:00,Minnesota Twins,Detroit Tigers,MyBookie.ag,Minnesota Twins,113,2026-04-09,823724,2026-04-09,142,116,690953.0,Mick Abel,656427.0,Jack Flaherty,Pre-Game,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,BetMGM,Arizona Diamondbacks,135,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,BetMGM,New York Mets,-160,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,BetOnline.ag,Arizona Diamondbacks,141,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,BetOnline.ag,New York Mets,-156,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,BetRivers,Arizona Diamondbacks,135,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,BetRivers,New York Mets,-177,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,BetUS,Arizona Diamondbacks,139,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,BetUS,New York Mets,-156,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,Bovada,Arizona Diamondbacks,139,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,Bovada,New York Mets,-165,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,DraftKings,Arizona Diamondbacks,139,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,DraftKings,New York Mets,-168,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,FanDuel,Arizona Diamondbacks,136,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,FanDuel,New York Mets,-162,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,LowVig.ag,Arizona Diamondbacks,141,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,LowVig.ag,New York Mets,-156,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,MyBookie.ag,Arizona Diamondbacks,139,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:11:00+00:00,New York Mets,Arizona Diamondbacks,MyBookie.ag,New York Mets,-164,2026-04-09,823645,2026-04-09,121,109,690997.0,Nolan McLean,593958.0,Eduardo Rodriguez,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,BetMGM,Chicago White Sox,150,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,BetMGM,Kansas City Royals,-180,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,BetOnline.ag,Chicago White Sox,160,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,BetOnline.ag,Kansas City Royals,-177,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,BetRivers,Chicago White Sox,145,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,BetRivers,Kansas City Royals,-186,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,BetUS,Chicago White Sox,156,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,BetUS,Kansas City Royals,-177,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,Bovada,Chicago White Sox,154,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,Bovada,Kansas City Royals,-186,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,DraftKings,Chicago White Sox,153,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,DraftKings,Kansas City Royals,-186,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,FanDuel,Chicago White Sox,150,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,FanDuel,Kansas City Royals,-178,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,LowVig.ag,Chicago White Sox,160,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,LowVig.ag,Kansas City Royals,-177,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,MyBookie.ag,Chicago White Sox,153,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-09 23:41:00+00:00,Kansas City Royals,Chicago White Sox,MyBookie.ag,Kansas City Royals,-182,2026-04-09,824130,2026-04-09,118,145,607625.0,Seth Lugo,641743.0,Anthony Kay,Scheduled,2026-04-09,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,BetMGM,Colorado Rockies,155,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,BetMGM,San Diego Padres,-190,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,BetOnline.ag,Colorado Rockies,168,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,BetOnline.ag,San Diego Padres,-186,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,BetRivers,Colorado Rockies,170,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,BetRivers,San Diego Padres,-230,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,BetUS,Colorado Rockies,162,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,BetUS,San Diego Padres,-185,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,Bovada,Colorado Rockies,163,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,Bovada,San Diego Padres,-198,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,DraftKings,Colorado Rockies,163,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,DraftKings,San Diego Padres,-199,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,FanDuel,Colorado Rockies,168,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,FanDuel,San Diego Padres,-200,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,LowVig.ag,Colorado Rockies,168,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,LowVig.ag,San Diego Padres,-186,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,MyBookie.ag,Colorado Rockies,166,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0
+2026-04-10 01:41:00+00:00,San Diego Padres,Colorado Rockies,MyBookie.ag,San Diego Padres,-196,2026-04-10,823318,2026-04-10,135,115,621111.0,Walker Buehler,608372.0,Tomoyuki Sugano,Scheduled,2026-04-10,0

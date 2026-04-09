@@ -41,8 +41,12 @@ def fetch_game_results(start_date, end_date):
             if not linescore:
                 continue
 
-            home_score = linescore["teams"]["home"]["runs"]
-            away_score = linescore["teams"]["away"]["runs"]
+            home_score = linescore.get("teams", {}).get("home", {}).get("runs")
+            away_score = linescore.get("teams", {}).get("away", {}).get("runs")
+
+            # some API rows have a linescore object but no run totals yet
+            if home_score is None or away_score is None:
+                continue
 
             home_win = 1 if home_score > away_score else 0
 

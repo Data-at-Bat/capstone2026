@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import os
 
 BASE_URL = "https://statsapi.mlb.com/api/v1/schedule"
@@ -92,9 +92,10 @@ def save_schedule(df: pd.DataFrame):
 
 if __name__ == "__main__":
 
-    # example: fetch last 365 days
-    end_date = datetime.today()
-    start_date = end_date - timedelta(days=365)
+    # fetch a tight rolling window around today
+    today = datetime.now(timezone.utc)
+    start_date = today - timedelta(days=3)
+    end_date = today + timedelta(days=3)
 
     df = fetch_schedule(
         start_date.strftime("%Y-%m-%d"),

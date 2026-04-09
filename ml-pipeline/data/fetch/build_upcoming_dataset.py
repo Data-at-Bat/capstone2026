@@ -7,31 +7,23 @@ RAW_DIR = os.path.join(BASE_DIR, "data", "raw")
 PROCESSED_DIR = os.path.join(BASE_DIR, "data", "processed")
 
 SCHEDULE_FILE = os.path.join(RAW_DIR, "schedule.csv")
-RESULTS_FILE = os.path.join(RAW_DIR, "game_results.csv")
+ODDS_FILE = os.path.join(PROCESSED_DIR, "odds_features.csv")
 
-OUTPUT_FILE = os.path.join(PROCESSED_DIR, "model_dataset.csv")
+OUTPUT_FILE = os.path.join(PROCESSED_DIR, "upcoming_games_with_odds.csv")
 
 
 def load_data():
-
     schedule = pd.read_csv(SCHEDULE_FILE)
-    results = pd.read_csv(RESULTS_FILE)
+    odds = pd.read_csv(ODDS_FILE)
+    return schedule, odds
 
-    return schedule, results
 
-
-def merge_data(schedule, results):
-
+def build_dataset(schedule, odds):
     df = schedule.merge(
-        results,
-        on=["game_id", "date"],
+        odds,
+        on="game_id",
         how="inner"
     )
-
-    return df
-
-
-def clean_dataset(df):
 
     columns = [
         "game_id",
@@ -41,38 +33,31 @@ def clean_dataset(df):
         "home_team_id",
         "away_team_id",
         "home_pitcher_id",
+        "home_pitcher_name",
         "away_pitcher_id",
-        "home_score",
-        "away_score",
-        "home_win"
+        "away_pitcher_name",
+        "home_moneyline",
+        "away_moneyline",
+        "home_implied_prob",
+        "away_implied_prob",
+        "status"
     ]
 
     df = df[columns]
-
-    # Drop games missing critical info
-    df = df.dropna(subset=["home_score", "away_score"])
 
     return df
 
 
 def save_dataset(df):
-
     os.makedirs(PROCESSED_DIR, exist_ok=True)
-
     df.to_csv(OUTPUT_FILE, index=False)
 
-    print(f"Saved dataset to {OUTPUT_FILE}")
-    print(f"Total rows: {len(df)}")
+    print(f"Saved upcoming dataset to {OUTPUT_FILE}")
+    print(f"Rows: {len(df)}")
+    print(df.head())
 
 
 if __name__ == "__main__":
-
-    schedule, results = load_data()
-
-    df = merge_data(schedule, results)
-
-    df = clean_dataset(df)
-
-    print(df.head())
-
+    schedule, odds = load_data()
+    df = build_dataset(schedule, odds)
     save_dataset(df)
