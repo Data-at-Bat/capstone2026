@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:app/shared/logging/logger_service.dart';
+import 'package:app/features/auth/presentation/providers/auth_provider.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
-  // Quality of Life State
-  bool _valueBetsAtTop = true;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      backgroundColor: const Color(0xFFC6DDF0), // Project Light Blue
+      backgroundColor: const Color(0xFFC6DDF0),
       appBar: AppBar(
-        title: const Text('Settings'),
-        backgroundColor: const Color(0xFF462255), // Project Dark Purple
+        title: const Text('Settings', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF462255),
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -28,51 +24,58 @@ class _SettingsPageState extends State<SettingsPage> {
           _buildSettingsTile(
             icon: Icons.person_outline,
             title: 'Profile Information',
-            onTap: () => _logAndNavigate('profile_info'),
-          ),
-          _buildSettingsTile(
-            icon: Icons.credit_card,
-            title: 'Subscription Settings',
-            subtitle: 'Manage active plan via RevenueCat',
-            onTap: () => _logAndNavigate('subscription_mgmt'),
+            onTap: () {
+              LoggerService.logEvent(fileName: 'settings_screen.dart', functionName: 'nav_profile', outcome: 'Success');
+              context.push('/profile');
+            },
           ),
           _buildSettingsTile(
             icon: Icons.star_border,
             title: 'Favorite Teams',
-            onTap: () => _logAndNavigate('favorite_teams'),
-          ),
-
-          const SizedBox(height: 24),
-          _buildSectionHeader('Quality of Life'),
-          
-          // Value Bets Toggle
-          SwitchListTile(
-            activeThumbColor: const Color(0xFF143109), // Project Dark Green
-            title: const Text('Value Bets at the Top'),
-            subtitle: const Text('Prioritize high-confidence edges'),
-            value: _valueBetsAtTop,
-            onChanged: (bool value) {
-              setState(() => _valueBetsAtTop = value);
-              LoggerService.logEvent(
-                fileName: 'settings_screen.dart',
-                functionName: 'toggle_value_bets($value)',
-                outcome: 'Success',
-              );
+            onTap: () {
+              LoggerService.logEvent(fileName: 'settings_screen.dart', functionName: 'nav_favorites', outcome: 'Success');
+              context.push('/favorites');
             },
           ),
 
           const SizedBox(height: 24),
           _buildSectionHeader('Account & Security'),
-          _buildSettingsTile(
-            icon: Icons.lock_outline,
-            title: 'Change Password',
-            onTap: () => _logAndNavigate('change_password'),
-          ),
+
+          // Change password moved to profile screen!
+
           _buildSettingsTile(
             icon: Icons.logout,
             title: 'Sign Out',
             textColor: Colors.redAccent,
-            onTap: () => _logAndNavigate('sign_out'),
+            onTap: () async {
+              LoggerService.logEvent(fileName: 'settings_screen.dart', functionName: 'sign_out_clicked', outcome: 'Prompted');
+
+              // NEW: Show Confirmation Dialog
+              final bool? confirmLogout = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Sign Out', style: TextStyle(fontWeight: FontWeight.bold)),
+                  content: const Text('Are you sure you want to sign out of your account?'),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false), // Returns false
+                      child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true), // Returns true
+                      child: const Text('Sign Out', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              );
+
+              // Only sign out if they hit "Sign Out"
+              if (confirmLogout == true) {
+                LoggerService.logEvent(fileName: 'settings_screen.dart', functionName: 'sign_out_confirmed', outcome: 'Success');
+                await ref.read(authRepositoryProvider).signOut();
+              }
+            },
           ),
         ],
       ),
@@ -84,23 +87,12 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          color: Color(0xFF462255),
-          letterSpacing: 1.2,
-          fontSize: 12,
-        ),
+        style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF462255), letterSpacing: 1.2, fontSize: 12),
       ),
     );
   }
 
-  Widget _buildSettingsTile({
-    required IconData icon,
-    required String title,
-    String? subtitle,
-    required VoidCallback onTap,
-    Color? textColor,
-  }) {
+  Widget _buildSettingsTile({required IconData icon, required String title, String? subtitle, required VoidCallback onTap, Color? textColor}) {
     return Card(
       elevation: 0,
       color: Colors.white.withValues(alpha: 0.7),
@@ -108,19 +100,10 @@ class _SettingsPageState extends State<SettingsPage> {
       child: ListTile(
         leading: Icon(icon, color: const Color(0xFF462255)),
         title: Text(title, style: TextStyle(color: textColor, fontWeight: FontWeight.w500)),
-        subtitle: subtitle != null ? Text(subtitle) : null,
-        trailing: const Icon(Icons.chevron_right, size: 20),
+        subtitle: subtitle != null ? Text(subtitle, style: TextStyle(color: Colors.grey[700], fontSize: 12)) : null,
+        trailing: const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
         onTap: onTap,
       ),
     );
-  }
-
-  void _logAndNavigate(String feature) {
-    LoggerService.logEvent(
-      fileName: 'settings_screen.dart',
-      functionName: 'navigate_to_$feature',
-      outcome: 'Success',
-    );
-    /* TODO: Implement actual navigation logging */
   }
 }

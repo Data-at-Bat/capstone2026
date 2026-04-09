@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/game_matchup.dart';
 import 'package:app/models/game_matchup.dart';
 
-class GameRepository {
+class PredictionRepository {
 
   final bool _useMockData = true; // Set to true to use mock data instead of making actual API calls
   final String baseUrl = 'http://localhost:8080';
