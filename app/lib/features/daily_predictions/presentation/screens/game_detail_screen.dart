@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../models/game_matchup.dart';
@@ -206,8 +205,8 @@ class GameDetailScreen extends StatelessWidget {
 
   Widget _buildPredictedWinnerBanner(GameMatchup game) {
     String winnerAbbr = "UNKNOWN";
-    if (game.predictedWinner == game.homeTeamName) winnerAbbr = _getAbbreviation(game.homeTeamId);
-    else if (game.predictedWinner == game.awayTeamName) winnerAbbr = _getAbbreviation(game.awayTeamId);
+    if (game.predictedWinner == game.homeTeamName) {winnerAbbr = _getAbbreviation(game.homeTeamId);}
+    else if (game.predictedWinner == game.awayTeamName) {winnerAbbr = _getAbbreviation(game.awayTeamId);}
 
     Color winnerColor = _getTeamColor(winnerAbbr);
 
