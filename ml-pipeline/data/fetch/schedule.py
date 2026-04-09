@@ -13,17 +13,7 @@ OUTPUT_FILE = "schedule.csv"
 def fetch_schedule(start_date: str, end_date: str) -> pd.DataFrame:
     """
     Fetch MLB schedule between two dates.
-
-    Returns DataFrame with:
-    - game_id
-    - date
-    - home_team
-    - away_team
-    - home_team_id
-    - away_team_id
-    - game_status
     """
-
     params = {
         "sportId": 1,
         "startDate": start_date,
@@ -35,38 +25,36 @@ def fetch_schedule(start_date: str, end_date: str) -> pd.DataFrame:
     response.raise_for_status()
 
     data = response.json()
-
     rows = []
 
     for date_block in data.get("dates", []):
         game_date = date_block["date"]
 
         for game in date_block.get("games", []):
-
             game_id = game["gamePk"]
 
             home_info = game["teams"]["home"]["team"]
             away_info = game["teams"]["away"]["team"]
 
-            # Skip games with incomplete team info (All-Star, exhibitions)
             if "name" not in home_info or "name" not in away_info:
                 continue
 
+            # NEW: Extract the exact game time from the API
+            exact_time = game.get("gameDate")
+
             home_team = home_info["name"]
             away_team = away_info["name"]
-
             home_team_id = home_info["id"]
             away_team_id = away_info["id"]
-
             status = game["status"]["detailedState"]
 
-            # probable pitchers (may not exist)
             home_pitcher = game["teams"]["home"].get("probablePitcher", {})
             away_pitcher = game["teams"]["away"].get("probablePitcher", {})
 
             rows.append({
                 "game_id": game_id,
                 "date": game_date,
+                "exact_time": exact_time,
                 "home_team": home_team,
                 "away_team": away_team,
                 "home_team_id": home_team_id,
@@ -78,9 +66,7 @@ def fetch_schedule(start_date: str, end_date: str) -> pd.DataFrame:
                 "status": status
             })
 
-    df = pd.DataFrame(rows)
-
-    return df
+    return pd.DataFrame(rows)
 
 
 def save_schedule(df: pd.DataFrame):
