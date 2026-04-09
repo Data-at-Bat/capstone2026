@@ -12,9 +12,9 @@ import 'package:app/features/daily_predictions/presentation/screens/game_detail_
 class MockPredictionRepository extends Mock implements PredictionRepository {}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late MockPredictionRepository mockRepo;
 
-  // Perfect mock game aligned with your backend and the specific test assertions
   final mockGame = GameMatchup(
     gameId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
     gameTime: DateTime.now().add(const Duration(hours: 2)),
@@ -38,13 +38,12 @@ void main() {
     mockRepo = MockPredictionRepository();
   });
 
-  // Helper widget to easily wrap our tests in the required Riverpod scope
   Widget createWidgetUnderTest() {
     return ProviderScope(
       overrides: [
-        // This injects the Mock Repository into our Riverpod ecosystem
         predictionRepositoryProvider.overrideWithValue(mockRepo),
       ],
+      // Because your app uses Navigator.push(), standard MaterialApp works natively!
       child: const MaterialApp(
         home: DailyPredictionsPage(),
       ),
@@ -52,14 +51,12 @@ void main() {
   }
 
   group('Daily Predictions Page Tests', () {
-
     testWidgets('Renders empty state when no games are returned', (tester) async {
       when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => []);
 
       await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle(); // Wait for the FutureProvider to resolve
+      await tester.pumpAndSettle();
 
-      // Asserts the exact empty state text from your updated UI
       expect(find.text('No games found for today.'), findsOneWidget);
     });
 
@@ -69,7 +66,6 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      // Verify the team abbreviations render on the main list cards
       expect(find.text('STL'), findsWidgets);
       expect(find.text('CHC'), findsWidgets);
     });
@@ -82,31 +78,22 @@ void main() {
 
       // Tap the card to trigger navigation
       await tester.tap(find.byType(InkWell).first);
-
-      // Wait for the Navigator.push page transition to finish
       await tester.pumpAndSettle();
 
       // --- UI ASSERTIONS FOR THE DETAIL SCREEN ---
-
-      // 1. Verify we actually navigated to the GameDetailScreen
       expect(find.byType(GameDetailScreen), findsOneWidget);
 
-      // 2. Check the Model Pick Banner
-      expect(find.text('Model Pick: '), findsOneWidget);
-      expect(find.text('St. Louis Cardinals'), findsWidgets); // Displays full name here
+      expect(find.text('Model Predicts: '), findsOneWidget); // Fixed text from UI code
+      expect(find.text('St. Louis Cardinals'), findsWidgets);
 
-      // 3. Check the Stat Badges
       expect(find.text('80.0%'), findsOneWidget);
       expect(find.textContaining('-2'), findsOneWidget);
 
-      // 4. Check the Predictive Factors Header exists
       expect(find.text('Key Predictive Factors'), findsOneWidget);
 
-      // 5. Check the Unlocked Value Bet Indicator (Because odds are +150)
       expect(find.text('VALUE BET EDGE'), findsOneWidget);
       expect(find.textContaining('+150'), findsOneWidget);
 
-      // 6. Ensure the lock feature is truly gone
       expect(find.text('Unlock Value Bets'), findsNothing);
     });
   });

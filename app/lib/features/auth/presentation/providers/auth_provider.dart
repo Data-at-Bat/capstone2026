@@ -12,4 +12,3 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return repository.authStateChanges;
 
 });
-

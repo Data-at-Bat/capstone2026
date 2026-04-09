@@ -73,7 +73,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: '/settings', // Changed from /my-subscription
+                path: '/settings',
                 builder: (context, state) => const SettingsPage(),
               ),
             ],
