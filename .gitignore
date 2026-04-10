@@ -6,8 +6,12 @@ data-at-bat-api/target/
 data/raw/*
 data/processed/*
 app/GEMINI.md
+data/raw/*
+data/processed/*
 
 # data files
 ml-pipeline/data/processed/*.csv
+!data/raw/.gitkeep
+!data/processed/.gitkeep
 !data/raw/.gitkeep
 !data/processed/.gitkeep
