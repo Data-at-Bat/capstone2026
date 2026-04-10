@@ -4,8 +4,8 @@ import 'package:app/models/game_matchup.dart';
 
 class PredictionRepository {
 
-  final bool _useMockData = true; // Set to true to use mock data instead of making actual API calls
-  final String baseUrl = 'http://localhost:8080';
+  final bool _useMockData = false; // Set to true to use mock data instead of making actual API calls
+  final String baseUrl = 'http://dataatbat.hopto.org:8080';
 
   // Fetches ALL games for the day, including deep stats and predictions
   // In the future there wll need to be userId and isPaidMember parameters to determine what data to return (blurred/unblurred)

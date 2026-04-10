@@ -1,6 +1,8 @@
 import os
 import joblib
 import pandas as pd
+import requests
+import json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -10,6 +12,10 @@ MODEL_FILE = os.path.join(BASE_DIR, "models", "lightgbm_v1", "model.pkl")
 OUTPUT_FILE = os.path.join(BASE_DIR, "data", "processed", "predictions.csv")
 FILTERED_OUTPUT_FILE = os.path.join(BASE_DIR, "data", "processed", "predictions_filtered.csv")
 PITCHER_STATS_FILE = os.path.join(BASE_DIR, "data", "raw", "pitcher_stats.csv")
+
+# --- API CONFIGURATION ---
+API_URL = "http://dataatbat.hopto.org:8080/games?batch=true"
+
 MIN_EDGE = 0.03
 MAX_EDGE = 0.30
 MIN_MODEL_PROB = 0.45
@@ -140,6 +146,69 @@ def prepare_features(df):
     return df[FEATURE_COLUMNS]
 
 
+def push_to_api(df):
+    payload = []
+    for index, row in df.iterrows():
+        # Build predictive factors dictionary
+        factors_dict = {
+            "home_last10_win_pct": row.get("home_last10_win_pct", 0.0),
+            "away_last10_win_pct": row.get("away_last10_win_pct", 0.0),
+            "home_pitching_era": row.get("home_pitcher_era", 0.0),
+            "away_pitching_era": row.get("away_pitcher_era", 0.0)
+        }
+
+        # --- LOGIC FOR GAME DATE/TIME ---
+        # 1. Try to get the high-precision UTC time first
+        # 2. If 'game_time_utc' is missing, fallback to 'date' column
+        raw_time = row.get("game_time_utc")
+
+        if pd.isna(raw_time) or raw_time == "":
+            # Fallback: Combine the date column with a midnight timestamp
+            date_val = str(row.get("date", "2026-01-01"))
+            game_time = f"{date_val}T00:00:00"
+        else:
+            # The MLB API returns '2026-04-10T23:05:00Z'
+            game_time = str(raw_time).replace("Z", "")
+
+        # Determine Predicted Winner, Confidence, Odds, and Spread
+        model_home_prob = float(row.get("model_home_win_prob", 0.5))
+
+        if model_home_prob >= 0.50:
+            predicted_winner = str(row["home_team"])
+            confidence_pct = round(model_home_prob * 100, 1)
+            target_odds = float(row.get("home_moneyline", 0.0))
+            target_spread = float(row.get("home_spread", 0.0))
+        else:
+            predicted_winner = str(row["away_team"])
+            confidence_pct = round((1.0 - model_home_prob) * 100, 1)
+            target_odds = float(row.get("away_moneyline", 0.0))
+            target_spread = float(row.get("away_spread", 0.0))
+
+        game_payload = {
+            "gameTime": game_time,
+            "homeTeamId": str(row["home_team_id"]),
+            "awayTeamId": str(row["away_team_id"]),
+            "homeTeamName": str(row["home_team"]),
+            "awayTeamName": str(row["away_team"]),
+            "predictedWinner": predicted_winner,
+            "confidence": confidence_pct,
+            "spread": target_spread,
+            "odds": target_odds,
+            "predictiveFactors": json.dumps(factors_dict)
+        }
+        payload.append(game_payload)
+
+    print(f"\nSending {len(payload)} predictions to Spring Boot API...")
+    try:
+        response = requests.post(API_URL, json=payload, headers={'Content-Type': 'application/json'})
+        if response.status_code in [200, 201]:
+            print("Success! Data saved/updated in the NEON database.")
+        else:
+            print(f"Failed to push data. Code: {response.status_code}\nResponse: {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"API Connection Error: {e}")
+
+
 def main():
     df = load_data()
     history_df = load_historical_data()
@@ -154,12 +223,13 @@ def main():
     df["model_home_win_prob"] = probs
     df["edge"] = df["model_home_win_prob"] - df["home_implied_prob"]
     df = df.sort_values("edge", ascending=False)
+
     filtered = df[
         (df["edge"] >= MIN_EDGE)
         & (df["edge"] <= MAX_EDGE)
         & (df["model_home_win_prob"] >= MIN_MODEL_PROB)
         & (df["model_home_win_prob"] <= MAX_MODEL_PROB)
-    ].copy()
+        ].copy()
 
     print("\nAll predictions sorted by edge:")
     print(
@@ -185,6 +255,9 @@ def main():
         f"model_prob in [{MIN_MODEL_PROB}, {MAX_MODEL_PROB}]) "
         f"to {FILTERED_OUTPUT_FILE}"
     )
+
+    # Push to Spring Boot API
+    push_to_api(df)
 
 
 if __name__ == "__main__":

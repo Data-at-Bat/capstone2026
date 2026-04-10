@@ -15,13 +15,18 @@ def fetch_schedule(start_date: str, end_date: str) -> pd.DataFrame:
     Fetch MLB schedule between two dates.
 
     Returns DataFrame with:
-    - game_id
+    - game_id,
+    - game_time_utc,
     - date
-    - home_team
-    - away_team
-    - home_team_id
-    - away_team_id
-    - game_status
+    - home_team,
+    - away_team,
+     -home_team_id,
+    - away_team_id,
+    - home_pitcher_id
+    - home_pitcher_name
+    - away_pitcher_id
+    - away_pitcher_name
+    - status
     """
 
     params = {
@@ -35,31 +40,30 @@ def fetch_schedule(start_date: str, end_date: str) -> pd.DataFrame:
     response.raise_for_status()
 
     data = response.json()
-
     rows = []
 
     for date_block in data.get("dates", []):
-        game_date = date_block["date"]
-
         for game in date_block.get("games", []):
-
+            # Extracting game details
             game_id = game["gamePk"]
+
+            # The 'gameDate' field in the MLB API is a UTC ISO timestamp
+            game_time_utc = game.get("gameDate")
 
             home_team = game["teams"]["home"]["team"]["name"]
             away_team = game["teams"]["away"]["team"]["name"]
-
             home_team_id = game["teams"]["home"]["team"]["id"]
             away_team_id = game["teams"]["away"]["team"]["id"]
-
             status = game["status"]["detailedState"]
 
-            # probable pitchers (may not exist)
+            # Probable pitchers (may not exist)
             home_pitcher = game["teams"]["home"].get("probablePitcher", {})
             away_pitcher = game["teams"]["away"].get("probablePitcher", {})
 
             rows.append({
                 "game_id": game_id,
-                "date": game_date,
+                "game_time_utc": game_time_utc,
+                "date": date_block["date"],
                 "home_team": home_team,
                 "away_team": away_team,
                 "home_team_id": home_team_id,
@@ -71,35 +75,35 @@ def fetch_schedule(start_date: str, end_date: str) -> pd.DataFrame:
                 "status": status
             })
 
-    df = pd.DataFrame(rows)
-
-    return df
+    return pd.DataFrame(rows)
 
 
 def save_schedule(df: pd.DataFrame):
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    if df.empty:
+        print("No games found for this period.")
+        return
 
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
     path = os.path.join(OUTPUT_DIR, OUTPUT_FILE)
 
     if os.path.exists(path):
         existing = pd.read_csv(path)
-        df = pd.concat([existing, df]).drop_duplicates("game_id")
+        # Combine and ensure we don't have duplicates
+        df = pd.concat([existing, df]).drop_duplicates("game_id", keep="last")
 
     df.to_csv(path, index=False)
-
     print(f"Saved {len(df)} games to {path}")
 
 
 if __name__ == "__main__":
-
     # fetch a tight rolling window around today
     today = datetime.now(timezone.utc)
     start_date = today - timedelta(days=3)
     end_date = today + timedelta(days=3)
 
-    df = fetch_schedule(
+    df_schedule = fetch_schedule(
         start_date.strftime("%Y-%m-%d"),
         end_date.strftime("%Y-%m-%d")
     )
 
-    save_schedule(df)
+    save_schedule(df_schedule)
