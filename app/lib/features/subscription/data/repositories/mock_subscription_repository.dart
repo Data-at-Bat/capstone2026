@@ -3,11 +3,10 @@ import 'package:app/features/subscription/domain/repositories/subscription_repos
 
 class MockSubscriptionRepository implements SubscriptionRepository {
   final _controller = StreamController<bool>.broadcast();
-  bool _isSubscribed = false;
+  bool _isSubscribed = true;
 
   MockSubscriptionRepository() {
-     // Default to false
-     // _controller.add(false); // No need if we yield logic below
+    // Default to true for now.
   }
 
   @override

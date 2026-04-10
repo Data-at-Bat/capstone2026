@@ -30,7 +30,7 @@ void main() {
       'home_ops': 0.768,
       'away_ops': 0.636,
       'home_pitching_era': 3.53,
-      'away_pitching_era': 4.71
+      'away_pitching_era': 4.71,
     },
   );
 
@@ -40,18 +40,16 @@ void main() {
 
   Widget createWidgetUnderTest() {
     return ProviderScope(
-      overrides: [
-        predictionRepositoryProvider.overrideWithValue(mockRepo),
-      ],
+      overrides: [predictionRepositoryProvider.overrideWithValue(mockRepo)],
       // Because your app uses Navigator.push(), standard MaterialApp works natively!
-      child: const MaterialApp(
-        home: DailyPredictionsPage(),
-      ),
+      child: const MaterialApp(home: DailyPredictionsPage()),
     );
   }
 
   group('Daily Predictions Page Tests', () {
-    testWidgets('Renders empty state when no games are returned', (tester) async {
+    testWidgets('Renders empty state when no games are returned', (
+      tester,
+    ) async {
       when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => []);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -61,7 +59,9 @@ void main() {
     });
 
     testWidgets('Renders game cards successfully', (tester) async {
-      when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => [mockGame]);
+      when(
+        () => mockRepo.fetchDailyGames(),
+      ).thenAnswer((_) async => [mockGame]);
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -70,8 +70,12 @@ void main() {
       expect(find.text('CHC'), findsWidgets);
     });
 
-    testWidgets('Behavioral: Tapping game card navigates to detail view', (tester) async {
-      when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => [mockGame]);
+    testWidgets('Behavioral: Tapping game card navigates to detail view', (
+      tester,
+    ) async {
+      when(
+        () => mockRepo.fetchDailyGames(),
+      ).thenAnswer((_) async => [mockGame]);
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
@@ -83,7 +87,10 @@ void main() {
       // --- UI ASSERTIONS FOR THE DETAIL SCREEN ---
       expect(find.byType(GameDetailScreen), findsOneWidget);
 
-      expect(find.text('Model Predicts: '), findsOneWidget); // Fixed text from UI code
+      expect(
+        find.text('Model Predicts: '),
+        findsOneWidget,
+      ); // Fixed text from UI code
       expect(find.text('St. Louis Cardinals'), findsWidgets);
 
       expect(find.text('80.0%'), findsOneWidget);
