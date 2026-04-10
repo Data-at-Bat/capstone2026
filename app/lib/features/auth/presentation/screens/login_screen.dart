@@ -1,10 +1,15 @@
 import 'package:app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sign_in_button/sign_in_button.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key, this.platformOverride});
+
+  final TargetPlatform? platformOverride;
 
   @override
   ConsumerState<LoginScreen> createState() => _LoginScreenState();
@@ -15,6 +20,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
+
+  bool get _supportsAppleSignIn =>
+      !kIsWeb &&
+      ((widget.platformOverride ?? defaultTargetPlatform) ==
+              TargetPlatform.iOS ||
+          (widget.platformOverride ?? defaultTargetPlatform) ==
+              TargetPlatform.macOS);
 
   Future<void> _login() async {
     setState(() {
@@ -30,6 +42,42 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     } catch (e) {
       setState(() => _errorMessage = e.toString().split(']').last.trim());
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _loginWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await ref.read(authRepositoryProvider).signInWithGoogle();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = 'Google sign in failed: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _loginWithApple() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await ref.read(authRepositoryProvider).signInWithApple();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _errorMessage = 'Apple sign in failed: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -112,6 +160,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             textAlign: TextAlign.center,
                           ),
                         ),
+                      if (_supportsAppleSignIn) ...[
+                        SignInWithAppleButton(
+                          onPressed: () {
+                            if (_isLoading) return;
+                            _loginWithApple();
+                          },
+                          style: SignInWithAppleButtonStyle.black,
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      _GoogleSignInButton(
+                        isLoading: _isLoading,
+                        onPressed: _loginWithGoogle,
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(child: Divider(color: Colors.grey.shade300)),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              'or use email',
+                              style: TextStyle(
+                                color: Colors.grey.shade600,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Expanded(child: Divider(color: Colors.grey.shade300)),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
                       TextField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -201,6 +281,31 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GoogleSignInButton extends StatelessWidget {
+  const _GoogleSignInButton({required this.isLoading, required this.onPressed});
+
+  final bool isLoading;
+  final Future<void> Function() onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Opacity(
+      opacity: isLoading ? 0.72 : 1,
+      child: IgnorePointer(
+        ignoring: isLoading,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: SignInButton(
+            Buttons.google,
+            text: 'Continue with Google',
+            onPressed: onPressed,
           ),
         ),
       ),

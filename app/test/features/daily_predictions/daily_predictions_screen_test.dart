@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:app/features/daily_predictions/data/repositories/prediction_repository.dart';
 import 'package:app/features/daily_predictions/presentation/providers/prediction_provider.dart';
 import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
 import 'package:app/models/game_matchup.dart';
