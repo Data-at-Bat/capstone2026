@@ -53,13 +53,17 @@ def build_upcoming_dataset(
     schedule: pd.DataFrame,
     odds: pd.DataFrame,
     *,
-    how: str = "inner",
+    how: str = "left",
     only_non_final: bool = True,
 ) -> pd.DataFrame:
     if only_non_final:
         schedule = filter_non_final_games(schedule)
 
     df = schedule.merge(odds, on="game_id", how=how)
+
+    no_odds = df["home_moneyline"].isna().sum() if "home_moneyline" in df.columns else 0
+    if no_odds:
+        print(f"Warning: {no_odds} game(s) have no odds (bookmakers haven't posted yet or odds fetch gap)")
 
     missing = [c for c in OUTPUT_COLUMNS if c not in df.columns]
     if missing:
@@ -96,8 +100,8 @@ def main() -> None:
     parser.add_argument(
         "--how",
         choices=("inner", "left", "right", "outer"),
-        default="inner",
-        help="Merge how (default: inner, same as original script)",
+        default="left",
+        help="Merge how (default: left — keeps all scheduled games, NaN odds for missing lines)",
     )
     parser.add_argument(
         "--include-final",

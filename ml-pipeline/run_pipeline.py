@@ -68,6 +68,8 @@ def _cmd_predict(args: argparse.Namespace) -> None:
 def _cmd_full(args: argparse.Namespace) -> None:
     _cmd_build(args)
     _cmd_train(args)
+    if args.season is None:
+        args.season = args.end_season
     _cmd_predict(args)
 
 

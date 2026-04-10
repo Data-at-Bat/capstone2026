@@ -2,11 +2,16 @@
 .vscode
 *.pyc
 data-at-bat-api/.env
+ml-pipeline/.env
 data-at-bat-api/target/
 data/raw/*
 data/processed/*
 
 # data files
 ml-pipeline/data/processed/*.csv
+ml-pipeline/data/raw/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
+
+# ml model artifacts
+ml-pipeline/models/lightgbm_v1/artifacts/

@@ -79,6 +79,9 @@ def build_upcoming_inference_frame(
 
     games["home_team_fg"] = games["home_team"].map(MLB_NAME_TO_FG)
     games["away_team_fg"] = games["away_team"].map(MLB_NAME_TO_FG)
+    unmapped = games[games["home_team_fg"].isna() | games["away_team_fg"].isna()]
+    if not unmapped.empty:
+        print(f"Warning: dropping {len(unmapped)} game(s) with unmapped team names: {unmapped['home_team'].tolist()} vs {unmapped['away_team'].tolist()}")
     games = games.dropna(subset=["home_team_fg", "away_team_fg"])
     games["season"] = season
 

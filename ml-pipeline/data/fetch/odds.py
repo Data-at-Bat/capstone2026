@@ -106,7 +106,7 @@ def merge_odds_api_onto_games(games: pd.DataFrame, api_key: str | None = None) -
             "home_implied_prob",
             "away_implied_prob",
         ]
-    ].drop_duplicates(subset=["home_team", "away_team", "game_date"], keep="last")
+    ].drop_duplicates(subset=["home_team", "away_team", "game_date"], keep="first")
 
     g = games.copy()
     g["_game_date_key"] = pd.to_datetime(g["date"]).dt.date
@@ -118,6 +118,10 @@ def merge_odds_api_onto_games(games: pd.DataFrame, api_key: str | None = None) -
         suffixes=("", "_api"),
     )
     merged = merged.drop(columns=["_game_date_key", "game_date"], errors="ignore")
+
+    unmatched = merged["home_moneyline"].isna().sum() if "home_moneyline" in merged.columns else 0
+    if unmatched:
+        print(f"Warning: {unmatched} game(s) could not be matched to live odds (team name mismatch?)")
 
     odds_cols = [
         "home_moneyline",
