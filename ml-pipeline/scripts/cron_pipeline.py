@@ -69,11 +69,13 @@ def push_to_api(df: pd.DataFrame) -> None:
         if model_prob >= 0.50:
             predicted_winner = str(row["home_team"])
             confidence = round(model_prob * 100, 1)
-            odds = float(row.get("home_moneyline", 0.0) or 0.0)
+            _ml = row.get("home_moneyline")
+            odds = 0.0 if pd.isna(_ml) else float(_ml)
         else:
             predicted_winner = str(row["away_team"])
             confidence = round((1.0 - model_prob) * 100, 1)
-            odds = float(row.get("away_moneyline", 0.0) or 0.0)
+            _ml = row.get("away_moneyline")
+            odds = 0.0 if pd.isna(_ml) else float(_ml)
 
         raw_time = row.get("game_time_utc")
         if pd.isna(raw_time) or raw_time == "":
@@ -81,10 +83,14 @@ def push_to_api(df: pd.DataFrame) -> None:
         else:
             game_time = str(raw_time).replace("Z", "")
 
+        def _f(key):
+            v = row.get(key)
+            return 0.0 if pd.isna(v) else float(v)
+
         factors = {
-            "edge": float(row.get("edge", 0.0) or 0.0),
-            "home_implied_prob": float(row.get("home_implied_prob", 0.0) or 0.0),
-            "away_implied_prob": float(row.get("away_implied_prob", 0.0) or 0.0),
+            "edge": _f("edge"),
+            "home_implied_prob": _f("home_implied_prob"),
+            "away_implied_prob": _f("away_implied_prob"),
         }
 
         payload.append({
