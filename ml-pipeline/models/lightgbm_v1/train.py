@@ -29,7 +29,6 @@ FULL_FEATURE_COLUMNS = BASE_FEATURE_COLUMNS + [
     "away_last10_win_pct",
 ]
 
-
 def load_data():
     df = pd.read_csv(DATA_PATH)
     return df
@@ -211,6 +210,7 @@ def parse_args():
     parser.add_argument("--learning-rate", type=float, default=0.05)
     return parser.parse_args()
 
+    return model
 
 if __name__ == "__main__":
     args = parse_args()
