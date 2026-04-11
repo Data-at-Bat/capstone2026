@@ -1,7 +1,7 @@
 package com.dataatbat.data_at_bat_api.services;
 
 import com.dataatbat.data_at_bat_api.domain.FavoriteEntity;
-import com.dataatbat.data_at_bat_api.persistence.repositories.IFavoritesRepository;
+import com.dataatbat.data_at_bat_api.persistence.IFavoritesRepository;
 import com.dataatbat.data_at_bat_api.presentation.presentation_models.FavoritesResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;

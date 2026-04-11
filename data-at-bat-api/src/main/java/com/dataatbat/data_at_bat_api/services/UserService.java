@@ -1,7 +1,7 @@
 package com.dataatbat.data_at_bat_api.services;
 
 import com.dataatbat.data_at_bat_api.domain.UserEntity;
-import com.dataatbat.data_at_bat_api.persistence.repositories.IUserRepository;
+import com.dataatbat.data_at_bat_api.persistence.IUserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

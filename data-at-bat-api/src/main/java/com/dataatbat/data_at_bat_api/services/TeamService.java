@@ -1,7 +1,7 @@
 package com.dataatbat.data_at_bat_api.services;
 
 import com.dataatbat.data_at_bat_api.domain.TeamEntity;
-import com.dataatbat.data_at_bat_api.persistence.repositories.ITeamsRepository;
+import com.dataatbat.data_at_bat_api.persistence.ITeamsRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
