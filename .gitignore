@@ -6,6 +6,7 @@ ml-pipeline/.env
 data-at-bat-api/target/
 data/raw/*
 data/processed/*
+app/GEMINI.md
 
 # data files
 ml-pipeline/data/processed/*.csv

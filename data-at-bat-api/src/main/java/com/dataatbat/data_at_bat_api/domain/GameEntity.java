@@ -2,12 +2,13 @@ package com.dataatbat.data_at_bat_api.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "game")
@@ -15,51 +16,55 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+
+
 public class GameEntity {
 
     @Id
-    @Column(name = "game_id")
-    @Getter
+    @Column(name = "gameid")
     private UUID gameId;
 
     @Column(name = "game_time", nullable = false)
-    @Getter
-    @Setter
     private LocalDateTime gameTime;
 
-    @Column(name = "home_team_id", nullable = false)
-    @Getter
-    @Setter
-    private UUID homeTeamId;
+    @Column(name = "home_teamid")
+    private String homeTeamId;
 
-    @Column(name = "away_team_id", nullable = false)
-    @Getter
-    @Setter
-    private UUID awayTeamId;
+    @Column(name = "away_teamid")
+    private String awayTeamId;
 
-    @Column(name = "status", length = 50)
-    @Getter
-    @Setter
-    private String status;
+    @Column(name = "home_team_name")
+    private String homeTeamName;
 
-    @Column(name = "final_score_home")
-    @Getter
-    @Setter
-    private Integer finalScoreHome;
+    @Column(name = "away_team_name")
+    private String awayTeamName;
 
-    @Column(name = "final_score_away")
-    @Getter
-    @Setter
-    private Integer finalScoreAway;
+    @Column(name = "predicted_winner")
+    private String predictedWinner;
 
-    @Getter
-    @Setter
-    @Column(name="game_features", nullable = false)
+    @Column(name = "confidence")
+    private Double confidence;
+
+    @Column(name = "spread")
+    private Double spread;
+
+    @Column(name = "odds")
+    private Double odds;
+
     @JdbcTypeCode(SqlTypes.JSON)
-    private Map<String, Object> gameFeatures;
+    @Column(name = "predictive_factors")
+    private String predictiveFactors;
 
-    @Column(name="game_features_last_updated")
-    @Getter
-    @Setter
-    private LocalDateTime gameFeaturesLastUpdated;
+    public void partialUpdate(GameEntity game) {
+        if (game.getGameTime() != null) setGameTime(game.getGameTime());
+        if (game.getHomeTeamId() != null) setHomeTeamId(game.getHomeTeamId());
+        if (game.getAwayTeamId() != null) setAwayTeamId(game.getAwayTeamId());
+        if (game.getHomeTeamName() != null) setHomeTeamName(game.getHomeTeamName());
+        if (game.getAwayTeamName() != null) setAwayTeamName(game.getAwayTeamName());
+        if (game.getPredictedWinner() != null) setPredictedWinner(game.getPredictedWinner());
+        if (game.getConfidence() != null) setConfidence(game.getConfidence());
+        if (game.getSpread() != null) setSpread(game.getSpread());
+        if (game.getOdds() != null) setOdds(game.getOdds());
+        if (game.getPredictiveFactors() != null) setPredictiveFactors(game.getPredictiveFactors());
+    }
 }

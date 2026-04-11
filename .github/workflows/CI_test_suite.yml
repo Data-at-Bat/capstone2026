@@ -65,4 +65,11 @@ jobs:
         run: flutter analyze
 
       - name: Flutter Test
-        run: flutter test
+        run: flutter test --coverage
+
+      - name: Upload Flutter Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-coverage
+          path: app/coverage/lcov.info
+          if-no-files-found: error

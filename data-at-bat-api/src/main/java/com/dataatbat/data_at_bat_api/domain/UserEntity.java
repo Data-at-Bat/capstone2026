@@ -10,9 +10,11 @@ import java.util.UUID;
 @Entity
 @Table(name="users")
 public class UserEntity {
+
     @Getter
+    @Setter
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @Column(name="uid")
     private UUID uid;
 
     @Getter
@@ -40,7 +42,7 @@ public class UserEntity {
     @Override
     public String toString() {
         return String.format("Id: %s\nEmail: %s\nSubscription Status: %s\nSubscription Expiration: %s",
-                uid.toString(),
+                (uid != null) ? uid.toString() : "NULL",
                 (email != null) ? email : "NULL",
                 (subscriptionStatus != null) ? subscriptionStatus.toString() : "false",
                 (subscriptionExpiry != null) ? subscriptionExpiry.toString() : "NULL"

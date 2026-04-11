@@ -1,59 +1,106 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:app/models/game_matchup.dart';
-import 'package:app/repositories/game_repository.dart';
-import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class MockGameRepository extends Mock implements GameRepository {}
+import 'package:app/models/game_matchup.dart';
+import 'package:app/features/daily_predictions/data/repositories/prediction_repository.dart';
+import 'package:app/features/daily_predictions/presentation/providers/prediction_provider.dart';
+import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
+import 'package:app/features/daily_predictions/presentation/screens/game_detail_screen.dart';
+
+class MockPredictionRepository extends Mock implements PredictionRepository {}
 
 void main() {
-  late MockGameRepository mockRepo;
+  TestWidgetsFlutterBinding.ensureInitialized();
+  late MockPredictionRepository mockRepo;
+
+  final mockGame = GameMatchup(
+    gameId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+    gameTime: DateTime.now().add(const Duration(hours: 2)),
+    homeTeamName: 'St. Louis Cardinals',
+    awayTeamName: 'Chicago Cubs',
+    homeTeamId: '138',
+    awayTeamId: '112',
+    predictedWinner: 'St. Louis Cardinals',
+    confidence: 80.0,
+    odds: 150.0,
+    spread: -2.0,
+    predictiveFactors: {
+      'home_ops': 0.768,
+      'away_ops': 0.636,
+      'home_pitching_era': 3.53,
+      'away_pitching_era': 4.71,
+    },
+  );
 
   setUp(() {
-    mockRepo = MockGameRepository();
+    mockRepo = MockPredictionRepository();
   });
 
-testWidgets('Behavioral: Tapping game card navigates to detail view', (tester) async {
-    final game = GameMatchup(
-        gameId: 101,
-        gameTime: DateTime.now().add(const Duration(hours: 2)),
-        homeTeamName: 'Cardinals',
-        awayTeamName: 'Cubs',
-        homeTeamAbbr: 'STL',
-        awayTeamAbbr: 'CHC',
-        predictedWinner: 'STL',
-        predictedProbability: 65.5,
-        confidencePrediction: 80.0,
-        valueBet: 150.0,
-        homeStats: {
-          'Batting Avg': '.255',
-          'ERA': '3.45',
-          'WHIP': '1.20',
-        },
-        awayStats: {
-          'Batting Avg': '.240',
-          'ERA': '4.10',
-          'WHIP': '1.35',
-        },
-      );
+  Widget createWidgetUnderTest() {
+    return ProviderScope(
+      overrides: [predictionRepositoryProvider.overrideWithValue(mockRepo)],
+      child: const MaterialApp(home: DailyPredictionsPage()),
+    );
+  }
 
-    when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => [game]);
+  group('Daily Predictions Page Tests', () {
+    testWidgets('Renders empty state when no games are returned', (
+      tester,
+    ) async {
+      when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => []);
 
-    await tester.pumpWidget(MaterialApp(
-      home: DailyPredictionsPage(repository: mockRepo),
-    ));
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
 
-    // Wait for the FutureBuilder to finish its mock fetch and build the list
-    await tester.pumpAndSettle();
+      expect(find.text('No games found for today.'), findsOneWidget);
+    });
 
-    // Verify Interaction
-    await tester.tap(find.byType(InkWell));
-    
-    // This pumpAndSettle waits for the Navigator.push page transition animation to finish
-    await tester.pumpAndSettle(); 
-    
-    expect(find.text('Predicted Winner: STL'), findsOneWidget);
+    testWidgets('Renders game cards successfully', (tester) async {
+      when(
+        () => mockRepo.fetchDailyGames(),
+      ).thenAnswer((_) async => [mockGame]);
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      expect(find.text('STL'), findsWidgets);
+      expect(find.text('CHC'), findsWidgets);
+    });
+
+    testWidgets('Behavioral: Tapping game card navigates to detail view', (
+      tester,
+    ) async {
+      when(
+        () => mockRepo.fetchDailyGames(),
+      ).thenAnswer((_) async => [mockGame]);
+
+      await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pumpAndSettle();
+
+      // Tap the card to trigger navigation
+      await tester.tap(find.byType(InkWell).first);
+      await tester.pumpAndSettle();
+
+      // --- UI ASSERTIONS FOR THE DETAIL SCREEN ---
+      expect(find.byType(GameDetailScreen), findsOneWidget);
+
+      expect(
+        find.text('Model Predicts: '),
+        findsOneWidget,
+      ); // Fixed text from UI code
+      expect(find.text('St. Louis Cardinals'), findsWidgets);
+
+      expect(find.text('80.0%'), findsOneWidget);
+      expect(find.textContaining('-2'), findsOneWidget);
+
+      expect(find.text('Key Predictive Factors'), findsOneWidget);
+
+      expect(find.text('VALUE BET EDGE'), findsOneWidget);
+      expect(find.textContaining('+150'), findsOneWidget);
+
+      expect(find.text('Unlock Value Bets'), findsNothing);
+    });
   });
-
 }

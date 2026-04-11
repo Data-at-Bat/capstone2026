@@ -1,36 +1,64 @@
-import 'package:app/app/app.dart';
+import 'package:app/features/auth/presentation/providers/auth_provider.dart';
 import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
 import 'package:app/features/subscription/presentation/screens/settings_screen.dart';
+import 'package:app/main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-// import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
+
+class MockUser extends Mock implements User {}
 
 void main() {
-  testWidgets('NavigationShell displays pages and navigates correctly', (
-    WidgetTester tester,
-  ) async {
-    // Build app and trigger a frame.
-    await tester.pumpWidget(MyApp());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that the default page is DailyPredictionsPage.
-    expect(find.byType(DailyPredictionsPage), findsOneWidget);
-    expect(find.byType(SettingsPage), findsNothing);
+  group('Main NavigationShell Tests', () {
+    late MockUser mockUser;
 
-    // Tap the 'Settings & Predictions' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.person));
-    await tester.pumpAndSettle();
+    setUp(() {
+      mockUser = MockUser();
+    });
 
-    // Verify that SettingsPage is displayed.
-    expect(find.byType(DailyPredictionsPage), findsNothing);
-    expect(find.byType(SettingsPage), findsOneWidget);
+    testWidgets('App launches directly into Daily Predictions', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            authStateProvider.overrideWith((ref) => Stream.value(mockUser)),
+          ],
+          child: const MyApp(),
+        ),
+      );
 
+      await tester.pumpAndSettle(const Duration(milliseconds: 300));
 
-    // Tap the 'Daily Predictions' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.list_alt));
-    await tester.pumpAndSettle();
+      expect(find.byType(DailyPredictionsPage), findsOneWidget);
+    });
 
-    // Verify that DailyPredictionsPage is displayed again.
-    expect(find.byType(DailyPredictionsPage), findsOneWidget);
-    expect(find.byType(SettingsPage), findsNothing);
+    testWidgets('Can navigate back and forth', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            authStateProvider.overrideWith((ref) => Stream.value(mockUser)),
+          ],
+          child: const MyApp(),
+        ),
+      );
+
+      await tester.pumpAndSettle(const Duration(milliseconds: 300));
+
+      final settingsTab = find.byIcon(Icons.person);
+      await tester.tap(settingsTab);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DailyPredictionsPage), findsNothing);
+      expect(find.byType(SettingsPage), findsOneWidget);
+
+      final predictionsTab = find.byIcon(Icons.list_alt);
+      await tester.tap(predictionsTab);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DailyPredictionsPage), findsOneWidget);
+    });
   });
 }

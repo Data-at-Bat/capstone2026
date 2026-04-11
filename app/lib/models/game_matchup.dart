@@ -1,51 +1,59 @@
+import 'dart:convert';
+
 class GameMatchup {
-  // --- List View Data (Basic Info) ---
-  final int gameId;
+  final String gameId;
   final DateTime gameTime;
   final String homeTeamName;
   final String awayTeamName;
-  final String homeTeamAbbr;
-  final String awayTeamAbbr;
-
-  // --- Detail View Data (Predictions & Odds) ---
+  final String homeTeamId;
+  final String awayTeamId;
   final String predictedWinner;
-  final double predictedProbability;
-  final double confidencePrediction;
-  final double valueBet;
+  final double confidence;
+  final double spread;
+  final double odds;
 
-  // --- Detail View Data (Stats) ---
-  final Map<String, String> homeStats;
-  final Map<String, String> awayStats;
+  // 1. Change this from a List<String> to a Map<String, dynamic>
+  final Map<String, dynamic> predictiveFactors;
 
   GameMatchup({
     required this.gameId,
     required this.gameTime,
     required this.homeTeamName,
     required this.awayTeamName,
-    required this.homeTeamAbbr,
-    required this.awayTeamAbbr,
+    required this.homeTeamId,
+    required this.awayTeamId,
     required this.predictedWinner,
-    required this.predictedProbability,
-    required this.confidencePrediction,
-    required this.valueBet,
-    required this.homeStats,
-    required this.awayStats,
+    required this.confidence,
+    required this.spread,
+    required this.odds,
+    required this.predictiveFactors,
   });
 
-  // Eventually need a factory constructor to parse the real API JSON
-  // This is a blueprint for that:
+  factory GameMatchup.fromJson(Map<String, dynamic> json) {
 
-  //   factory GameMatchup.fromJson(Map<String, dynamic> json) {
-  //     return GameMatchup(
-  //       gameId: json['id'] ?? 0,
-  //       homeTeamName: json['homeTeamName'] ?? 'Unknown',
-  //       homeTeamAbbr: json['homeTeamAbbr'] ?? 'UNK',
-  //       awayTeamName: json['awayTeamName'] ?? 'Unknown',
-  //       awayTeamAbbr: json['awayTeamAbbr'] ?? 'UNK',
-  //       gameTime: json['gameTime'] != null 
-  //           ? DateTime.parse(json['gameTime']) 
-  //           : DateTime.now(),
-  //     );
-  //   }
-  // }
+    // 2. Safely parse the predictiveFactors string back into a Map
+    Map<String, dynamic> parsedFactors = {};
+    if (json['predictiveFactors'] != null) {
+      if (json['predictiveFactors'] is String) {
+        // Unwraps the stringified JSON from Spring Boot
+        parsedFactors = jsonDecode(json['predictiveFactors']);
+      } else if (json['predictiveFactors'] is Map) {
+        parsedFactors = Map<String, dynamic>.from(json['predictiveFactors']);
+      }
+    }
+
+    return GameMatchup(
+      gameId: json['gameId'] ?? '',
+      gameTime: DateTime.parse(json['gameTime'] + 'Z').toLocal(),
+      homeTeamName: json['homeTeamName'] ?? '',
+      awayTeamName: json['awayTeamName'] ?? '',
+      homeTeamId: json['homeTeamId'] ?? '',
+      awayTeamId: json['awayTeamId'] ?? '',
+      predictedWinner: json['predictedWinner'] ?? '',
+      confidence: (json['confidence'] ?? 0.0).toDouble(),
+      spread: (json['spread'] ?? 0.0).toDouble(),
+      odds: (json['odds'] ?? 0.0).toDouble(),
+      predictiveFactors: parsedFactors, // Pass the parsed map here
+    );
+  }
 }

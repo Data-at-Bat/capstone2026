@@ -9,7 +9,7 @@ class NavigationShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Data at Bat')),
+      // AppBar removed as child pages provide their own
       body: navigationShell,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -19,12 +19,8 @@ class NavigationShell extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Settings & Subscription',
+            label: 'Settings',
           ),
-          // BottomNavigationBarItem(
-          //   icon: Icon(Icons.history),
-          //   label: 'Historical Accuracy',
-          // ),
         ],
         currentIndex: navigationShell.currentIndex,
         onTap: (index) => navigationShell.goBranch(index),
