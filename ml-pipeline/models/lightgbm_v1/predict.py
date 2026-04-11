@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import joblib
@@ -165,13 +165,15 @@ def run_predict(
     upcoming_csv: Path | None = None,
     prefer_upcoming_file: bool = True,
     predict_date: date | None = None,
-) -> Path:
+    predict_days: int = 1,
+) -> tuple[Path, pd.DataFrame]:
     """
     If ``season`` is set: historical mode — load ``unified_all`` (or ``unified_path``), filter
     to that season, merge odds from file, predict, write slim CSV + print.
 
-    If ``season`` is None: upcoming mode — games on ``predict_date`` (default today), merge odds
-    (CSV then live API if needed), predict, write slim CSV + print.
+    If ``season`` is None: upcoming mode — games starting from ``predict_date`` (default today)
+    through ``predict_days`` days ahead, merge odds (CSV then live API if needed), predict,
+    write slim CSV + print.
     """
     odds_p = Path(odds_path) if odds_path else DEFAULT_ODDS_PATH
     out = output_path or DEFAULT_PREDICTIONS_PATH
@@ -189,8 +191,9 @@ def run_predict(
     else:
         from data.upcoming_infer import build_upcoming_inference_frame
 
-        slate_day = predict_date if predict_date is not None else date.today()
-        print(f"Upcoming mode: slate date {slate_day}")
+        slate_start = predict_date if predict_date is not None else date.today()
+        slate_end = slate_start + timedelta(days=predict_days - 1)
+        print(f"Upcoming mode: {slate_start} .. {slate_end} ({predict_days} day(s))")
 
         schedule_df = None
         if upcoming_csv is not None:
@@ -209,7 +212,8 @@ def run_predict(
         df = build_upcoming_inference_frame(
             season=upcoming_season,
             schedule=schedule_df,
-            on_date=slate_day,
+            start_date=slate_start.isoformat(),
+            end_date=slate_end.isoformat(),
         )
         if df.empty:
             slim = _build_slim_table(df)
@@ -218,7 +222,7 @@ def run_predict(
             slim.to_csv(out, index=False)
             print(f"Saved empty predictions to {out}")
             _print_predictions(slim)
-            return out
+            return out, df
         df = _attach_odds(df, odds_p)
 
     df = df.copy()
@@ -232,7 +236,7 @@ def run_predict(
     slim.to_csv(out, index=False)
     print(f"Saved predictions to {out} ({len(slim)} rows)\n")
     _print_predictions(slim)
-    return out
+    return out, df
 
 
 if __name__ == "__main__":

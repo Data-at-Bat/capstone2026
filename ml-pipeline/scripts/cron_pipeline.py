@@ -5,84 +5,53 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import date
 from pathlib import Path
 
 import pandas as pd
 import requests
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).resolve().parent.parent / ".env")
-
 _ML_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(_ML_ROOT / ".env")
+
 if str(_ML_ROOT) not in sys.path:
     sys.path.insert(0, str(_ML_ROOT))
 
-from data.upcoming_infer import build_upcoming_inference_frame
-from models.lightgbm_v1.predict import (
-    _attach_odds,
-    _build_slim_table,
-    _compute_edges,
-    _print_predictions,
-    load_feature_names,
-    load_model,
-    DEFAULT_ODDS_PATH,
-    DEFAULT_PREDICTIONS_PATH,
-)
-from models.lightgbm_v1.train import align_X
+from models.lightgbm_v1.predict import run_predict  # noqa: E402
 
 # ── API configuration ──────────────────────────────────────────────
 API_URL = "http://dataatbat.hopto.org:8080/games?batch=true"
 
 
-def predict_today() -> pd.DataFrame:
-    """Build features for today's games, run model, return full DataFrame."""
-    today = date.today()
-    print(f"=== Daily Pipeline: {today} ===\n")
-
-    df = build_upcoming_inference_frame(on_date=today)
-    if df.empty:
-        print("No games scheduled today.")
-        return df
-
-    df = _attach_odds(df, DEFAULT_ODDS_PATH)
-
-    feature_names = load_feature_names()
-    model = load_model()
-    X = align_X(df, feature_names)
-    df["predicted_home_win_prob"] = model.predict_proba(X)[:, 1]
-    df = _compute_edges(df)
-
-    # save slim predictions CSV
-    slim = _build_slim_table(df)
-    DEFAULT_PREDICTIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
-    slim.to_csv(DEFAULT_PREDICTIONS_PATH, index=False)
-    print(f"\nSaved predictions to {DEFAULT_PREDICTIONS_PATH} ({len(slim)} rows)\n")
-    _print_predictions(slim)
-
-    return df
-
-
 def push_to_api(df: pd.DataFrame) -> None:
     """Format prediction rows as GameEntity JSON and POST batch to the API."""
+    # Only send games that have odds data
+    odds_col = "home_moneyline"
+    if odds_col in df.columns:
+        has_odds = df[odds_col].notna()
+        skipped = (~has_odds).sum()
+        if skipped:
+            print(f"Skipping {skipped} game(s) with no odds (lines not yet posted)")
+        df = df[has_odds]
+
     payload = []
     for _, row in df.iterrows():
         model_prob = float(row.get("predicted_home_win_prob", 0.5))
 
+        def _nullable(key):
+            v = row.get(key)
+            return None if pd.isna(v) else float(v)
+
         if model_prob >= 0.50:
             predicted_winner = str(row["home_team"])
             confidence = round(model_prob * 100, 1)
-            _ml = row.get("home_moneyline")
-            odds = 0.0 if pd.isna(_ml) else float(_ml)
-            _sp = row.get("home_spread")
-            spread = 0.0 if pd.isna(_sp) else float(_sp)
+            odds = _nullable("home_moneyline")
+            spread = _nullable("home_spread")
         else:
             predicted_winner = str(row["away_team"])
             confidence = round((1.0 - model_prob) * 100, 1)
-            _ml = row.get("away_moneyline")
-            odds = 0.0 if pd.isna(_ml) else float(_ml)
-            _sp = row.get("away_spread")
-            spread = 0.0 if pd.isna(_sp) else float(_sp)
+            odds = _nullable("away_moneyline")
+            spread = _nullable("away_spread")
 
         raw_time = row.get("game_time_utc")
         if pd.isna(raw_time) or raw_time == "":
@@ -90,14 +59,10 @@ def push_to_api(df: pd.DataFrame) -> None:
         else:
             game_time = str(raw_time).replace("Z", "")
 
-        def _f(key):
-            v = row.get(key)
-            return 0.0 if pd.isna(v) else float(v)
-
         factors = {
-            "edge": _f("edge"),
-            "home_implied_prob": _f("home_implied_prob"),
-            "away_implied_prob": _f("away_implied_prob"),
+            "edge": _nullable("edge"),
+            "home_implied_prob": _nullable("home_implied_prob"),
+            "away_implied_prob": _nullable("away_implied_prob"),
         }
 
         payload.append({
@@ -125,7 +90,8 @@ def push_to_api(df: pd.DataFrame) -> None:
 
 
 def main():
-    df = predict_today()
+    print(f"=== Daily Pipeline ===\n")
+    _, df = run_predict(predict_days=7, prefer_upcoming_file=False)
     if df.empty:
         return
     push_to_api(df)
