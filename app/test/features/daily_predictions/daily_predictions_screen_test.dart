@@ -19,11 +19,11 @@ void main() {
   });
 
   testWidgets('shows a loading indicator while predictions load', (
-    tester,
-  ) async {
+      tester,
+      ) async {
     final completer = Completer<List<GameMatchup>>();
     when(
-      () => mockPredictionRepository.fetchDailyGames(),
+          () => mockPredictionRepository.fetchDailyGames(),
     ).thenAnswer((_) => completer.future);
 
     await pumpWidgetApp(
@@ -41,10 +41,10 @@ void main() {
   });
 
   testWidgets('renders an error state when the repository throws', (
-    tester,
-  ) async {
+      tester,
+      ) async {
     when(
-      () => mockPredictionRepository.fetchDailyGames(),
+          () => mockPredictionRepository.fetchDailyGames(),
     ).thenThrow(Exception('network unavailable'));
 
     await pumpWidgetApp(
@@ -63,7 +63,7 @@ void main() {
 
   testWidgets('renders multiple games from the repository', (tester) async {
     when(() => mockPredictionRepository.fetchDailyGames()).thenAnswer(
-      (_) async => [
+          (_) async => [
         buildGameMatchup(gameId: 'game-1', homeTeamName: 'Cardinals'),
         buildGameMatchup(
           gameId: 'game-2',
@@ -93,10 +93,10 @@ void main() {
   });
 
   testWidgets('falls back to text when a team logo asset is missing', (
-    tester,
-  ) async {
+      tester,
+      ) async {
     when(() => mockPredictionRepository.fetchDailyGames()).thenAnswer(
-      (_) async => [
+          (_) async => [
         buildGameMatchup(
           homeTeamId: 'HOMELESS',
           awayTeamId: 'AWAYLESS',
@@ -122,11 +122,12 @@ void main() {
     expect(find.text('AWAYLESS'), findsWidgets);
   });
 
-  testWidgets('shows the large value badge for strong positive-odds edges', (
-    tester,
-  ) async {
+  // UPDATED: Now looks for the unified "VALUE EDGE DETECTED" string
+  testWidgets('shows the value edge badge for strong positive-odds edges', (
+      tester,
+      ) async {
     when(
-      () => mockPredictionRepository.fetchDailyGames(),
+          () => mockPredictionRepository.fetchDailyGames(),
     ).thenAnswer((_) async => [buildGameMatchup(odds: 140, confidence: 72)]);
 
     await pumpWidgetApp(
@@ -140,14 +141,15 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('LARGE VALUE EDGE'), findsOneWidget);
+    expect(find.text('VALUE EDGE DETECTED'), findsOneWidget);
   });
 
-  testWidgets('shows the regular value badge for smaller positive-odds edges', (
-    tester,
-  ) async {
+  // UPDATED: Now looks for the unified "VALUE EDGE DETECTED" string
+  testWidgets('shows the value edge badge for smaller positive-odds edges', (
+      tester,
+      ) async {
     when(
-      () => mockPredictionRepository.fetchDailyGames(),
+          () => mockPredictionRepository.fetchDailyGames(),
     ).thenAnswer((_) async => [buildGameMatchup(odds: 115, confidence: 55)]);
 
     await pumpWidgetApp(
@@ -161,12 +163,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('VALUE PICK'), findsOneWidget);
+    expect(find.text('VALUE EDGE DETECTED'), findsOneWidget);
   });
 
   testWidgets('does not show a value badge for negative odds', (tester) async {
     when(
-      () => mockPredictionRepository.fetchDailyGames(),
+          () => mockPredictionRepository.fetchDailyGames(),
     ).thenAnswer((_) async => [buildGameMatchup(odds: -120)]);
 
     await pumpWidgetApp(
@@ -180,7 +182,6 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('LARGE VALUE EDGE'), findsNothing);
-    expect(find.text('VALUE PICK'), findsNothing);
+    expect(find.text('VALUE EDGE DETECTED'), findsNothing);
   });
 }

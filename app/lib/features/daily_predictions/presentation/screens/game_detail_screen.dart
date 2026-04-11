@@ -159,13 +159,13 @@ class GameDetailScreen extends StatelessWidget {
   Widget _buildOddsExplanationCard(GameMatchup game) {
     String oddsStr = game.odds > 0 ? "+${game.odds}" : game.odds.toString();
 
-    // In standard betting: Negative odds mean they are the favorite. Positive means underdog.
-    String favoredTeam = "Even Matchup";
-    if (game.odds < 0) {
-      favoredTeam = game.homeTeamName;
-    } else if (game.odds > 0) {
-      favoredTeam = game.awayTeamName;
-    }
+    // A positive odds number means the target team is the underdog.
+    bool isUnderdog = game.odds > 0;
+
+    // Figure out who the opponent is based on the predicted winner
+    String opponentName = game.predictedWinner == game.homeTeamName
+        ? (game.awayTeamName)
+        : (game.homeTeamName);
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -188,11 +188,21 @@ class GameDetailScreen extends StatelessWidget {
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
-              style: const TextStyle(fontSize: 15, height: 1.4, color: Colors.black87),
+              style: const TextStyle(fontSize: 15, height: 1.5, color: Colors.black87),
               children: [
-                const TextSpan(text: "The betting markets currently favor the "),
-                TextSpan(text: favoredTeam, style: const TextStyle(fontWeight: FontWeight.w900)),
-                TextSpan(text: " with a moneyline of "),
+                const TextSpan(text: "The betting markets currently have the "),
+                TextSpan(text: game.predictedWinner, style: const TextStyle(fontWeight: FontWeight.w900)),
+                const TextSpan(text: " as the "),
+                TextSpan(
+                    text: isUnderdog ? "Underdog" : "Favorite",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        color: isUnderdog ? Colors.orange.shade800 : Colors.blue.shade800
+                    )
+                ),
+                const TextSpan(text: " against the "),
+                TextSpan(text: opponentName, style: const TextStyle(fontWeight: FontWeight.w900)),
+                const TextSpan(text: " with a payout line of "),
                 TextSpan(text: oddsStr, style: const TextStyle(fontWeight: FontWeight.w900, color: Color(0xFF2374AB))),
                 const TextSpan(text: "."),
               ],
