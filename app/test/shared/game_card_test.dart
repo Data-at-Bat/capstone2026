@@ -41,7 +41,6 @@ void main() {
   Widget createWidgetUnderTest() {
     return ProviderScope(
       overrides: [predictionRepositoryProvider.overrideWithValue(mockRepo)],
-      // Because your app uses Navigator.push(), standard MaterialApp works natively!
       child: const MaterialApp(home: DailyPredictionsPage()),
     );
   }
