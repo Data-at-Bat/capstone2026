@@ -242,12 +242,31 @@ class GameDetailScreen extends StatelessWidget {
   Widget _buildStatBadges(GameMatchup game) {
     String formattedSpread = game.spread > 0 ? "+${game.spread}" : game.spread.toString();
 
+    // Determine the abbreviation of the predicted winner
+    String winnerAbbr = "Team";
+    if (game.predictedWinner == game.homeTeamName) {
+      winnerAbbr = _getAbbreviation(game.homeTeamId);
+    } else if (game.predictedWinner == game.awayTeamName) {
+      winnerAbbr = _getAbbreviation(game.awayTeamId);
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildSingleBadge("Model Confidence", "${game.confidence.toStringAsFixed(1)}%", Icons.query_stats, Colors.blue),
+        _buildSingleBadge(
+            "Model Confidence",
+            "${game.confidence.toStringAsFixed(1)}%",
+            Icons.query_stats,
+            Colors.blue
+        ),
         const SizedBox(width: 16),
-        _buildSingleBadge("Spread", formattedSpread, Icons.compare_arrows, Colors.orange),
+        // Dynamically insert the team abbreviation into the title
+        _buildSingleBadge(
+            "$winnerAbbr Spread",
+            formattedSpread,
+            Icons.compare_arrows,
+            Colors.orange
+        ),
       ],
     );
   }
