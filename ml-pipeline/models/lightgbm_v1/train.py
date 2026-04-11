@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 from pathlib import Path
 
@@ -158,8 +159,6 @@ def parse_args():
     parser.add_argument("--num-leaves", type=int, default=15)
     parser.add_argument("--learning-rate", type=float, default=0.05)
     return parser.parse_args()
-
-    return model
 
 if __name__ == "__main__":
     train()
