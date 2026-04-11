@@ -17,23 +17,36 @@ def american_to_implied_prob(american: float) -> float:
     return -american / (-american + 100)
 
 
-def _best_prices_for_game(game: dict[str, Any]) -> tuple[float | None, float | None]:
+def _best_prices_for_game(
+    game: dict[str, Any],
+) -> tuple[float | None, float | None, float | None, float | None]:
+    """Return (best_home_ml, best_away_ml, home_spread_point, away_spread_point)."""
     home_team = game["home_team"]
     away_team = game["away_team"]
     best_home: float | None = None
     best_away: float | None = None
+    home_spread: float | None = None
+    away_spread: float | None = None
     for bookmaker in game.get("bookmakers", []):
         for market in bookmaker.get("markets", []):
-            if market.get("key") != "h2h":
-                continue
+            key = market.get("key")
             for outcome in market.get("outcomes", []):
                 name = outcome["name"]
-                price = float(outcome["price"])
-                if name == home_team:
-                    best_home = max(best_home, price) if best_home is not None else price
-                elif name == away_team:
-                    best_away = max(best_away, price) if best_away is not None else price
-    return best_home, best_away
+                if key == "h2h":
+                    price = float(outcome["price"])
+                    if name == home_team:
+                        best_home = max(best_home, price) if best_home is not None else price
+                    elif name == away_team:
+                        best_away = max(best_away, price) if best_away is not None else price
+                elif key == "spreads":
+                    point = outcome.get("point")
+                    if point is not None:
+                        point = float(point)
+                        if name == home_team and home_spread is None:
+                            home_spread = point
+                        elif name == away_team and away_spread is None:
+                            away_spread = point
+    return best_home, best_away, home_spread, away_spread
 
 
 def fetch_mlb_odds_wide(api_key: str | None = None) -> pd.DataFrame:
@@ -52,7 +65,7 @@ def fetch_mlb_odds_wide(api_key: str | None = None) -> pd.DataFrame:
         params={
             "apiKey": key,
             "regions": "us",
-            "markets": "h2h",
+            "markets": "h2h,spreads",
             "oddsFormat": "american",
         },
         timeout=45,
@@ -61,7 +74,7 @@ def fetch_mlb_odds_wide(api_key: str | None = None) -> pd.DataFrame:
     data = resp.json()
     rows: list[dict] = []
     for g in data:
-        bh, ba = _best_prices_for_game(g)
+        bh, ba, hs, as_ = _best_prices_for_game(g)
         if bh is None or ba is None:
             continue
         rows.append(
@@ -73,6 +86,8 @@ def fetch_mlb_odds_wide(api_key: str | None = None) -> pd.DataFrame:
                 "away_moneyline": ba,
                 "home_implied_prob": american_to_implied_prob(bh),
                 "away_implied_prob": american_to_implied_prob(ba),
+                "home_spread": hs,
+                "away_spread": as_,
             }
         )
     return pd.DataFrame(rows)
@@ -96,6 +111,7 @@ def merge_odds_api_onto_games(games: pd.DataFrame, api_key: str | None = None) -
     if wide.empty:
         return games
     wide = add_event_dates_eastern(wide)
+    spread_cols = [c for c in ["home_spread", "away_spread"] if c in wide.columns]
     use = wide[
         [
             "home_team",
@@ -105,7 +121,7 @@ def merge_odds_api_onto_games(games: pd.DataFrame, api_key: str | None = None) -
             "away_moneyline",
             "home_implied_prob",
             "away_implied_prob",
-        ]
+        ] + spread_cols
     ].drop_duplicates(subset=["home_team", "away_team", "game_date"], keep="first")
 
     g = games.copy()
@@ -128,6 +144,8 @@ def merge_odds_api_onto_games(games: pd.DataFrame, api_key: str | None = None) -
         "away_moneyline",
         "home_implied_prob",
         "away_implied_prob",
+        "home_spread",
+        "away_spread",
     ]
     for c in odds_cols:
         alt = f"{c}_api"

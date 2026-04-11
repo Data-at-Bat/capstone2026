@@ -10,6 +10,9 @@ from pathlib import Path
 
 import pandas as pd
 import requests
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 _ML_ROOT = Path(__file__).resolve().parent.parent
 if str(_ML_ROOT) not in sys.path:
@@ -71,11 +74,15 @@ def push_to_api(df: pd.DataFrame) -> None:
             confidence = round(model_prob * 100, 1)
             _ml = row.get("home_moneyline")
             odds = 0.0 if pd.isna(_ml) else float(_ml)
+            _sp = row.get("home_spread")
+            spread = 0.0 if pd.isna(_sp) else float(_sp)
         else:
             predicted_winner = str(row["away_team"])
             confidence = round((1.0 - model_prob) * 100, 1)
             _ml = row.get("away_moneyline")
             odds = 0.0 if pd.isna(_ml) else float(_ml)
+            _sp = row.get("away_spread")
+            spread = 0.0 if pd.isna(_sp) else float(_sp)
 
         raw_time = row.get("game_time_utc")
         if pd.isna(raw_time) or raw_time == "":
@@ -101,7 +108,7 @@ def push_to_api(df: pd.DataFrame) -> None:
             "awayTeamName": str(row["away_team"]),
             "predictedWinner": predicted_winner,
             "confidence": confidence,
-            "spread": 0.0,
+            "spread": spread,
             "odds": odds,
             "predictiveFactors": json.dumps(factors),
         })
