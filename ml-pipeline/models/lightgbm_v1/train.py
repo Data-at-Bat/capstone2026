@@ -39,6 +39,23 @@ DROP_COLS = [
     "home_win",
 ]
 
+BASE_FEATURE_COLUMNS = [
+    "home_team_id",
+    "away_team_id",
+    "home_pitcher_id",
+    "away_pitcher_id",
+    "home_pitcher_era",
+    "away_pitcher_era",
+    "home_pitcher_whip",
+    "away_pitcher_whip",
+]
+
+FULL_FEATURE_COLUMNS = BASE_FEATURE_COLUMNS + [
+    "home_team_win_pct",
+    "away_team_win_pct",
+    "home_last10_win_pct",
+    "away_last10_win_pct",
+]
 
 def load_unified(path: Path | None = None) -> pd.DataFrame:
     p = path or DEFAULT_UNIFIED_PATH
@@ -128,6 +145,21 @@ def train(
 
     return model, metrics
 
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Train LightGBM MLB model.")
+    parser.add_argument(
+        "--feature-set",
+        choices=["base8", "full12"],
+        default="full12",
+        help="base8: IDs + pitcher stats; full12: base8 + team form features",
+    )
+    parser.add_argument("--n-estimators", type=int, default=150)
+    parser.add_argument("--num-leaves", type=int, default=15)
+    parser.add_argument("--learning-rate", type=float, default=0.05)
+    return parser.parse_args()
+
+    return model
 
 if __name__ == "__main__":
     train()
