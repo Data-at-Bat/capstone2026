@@ -1,51 +1,135 @@
-import subprocess
+#!/usr/bin/env python3
+"""Daily CRON entry point: predict today's games and POST to the Spring Boot API."""
+
+from __future__ import annotations
+
+import json
 import sys
+from datetime import date
 from pathlib import Path
 
-# Define base paths
-BASE_DIR = Path(__file__).resolve().parents[1]
-FETCH_DIR = BASE_DIR / "data" / "fetch"
-SCRIPTS_DIR = BASE_DIR / "scripts"
+import pandas as pd
+import requests
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+
+_ML_ROOT = Path(__file__).resolve().parent.parent
+if str(_ML_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ML_ROOT))
+
+from data.upcoming_infer import build_upcoming_inference_frame
+from models.lightgbm_v1.predict import (
+    _attach_odds,
+    _build_slim_table,
+    _compute_edges,
+    _print_predictions,
+    load_feature_names,
+    load_model,
+    DEFAULT_ODDS_PATH,
+    DEFAULT_PREDICTIONS_PATH,
+)
+from models.lightgbm_v1.train import align_X
+
+# ── API configuration ──────────────────────────────────────────────
+API_URL = "http://dataatbat.hopto.org:8080/games?batch=true"
 
 
-def run_script(script_path: Path) -> None:
-    """Executes a python script and halts the pipeline if it fails."""
-    if not script_path.exists():
-        raise FileNotFoundError(f"Script not found: {script_path}")
+def predict_today() -> pd.DataFrame:
+    """Build features for today's games, run model, return full DataFrame."""
+    today = date.today()
+    print(f"=== Daily Pipeline: {today} ===\n")
 
-    print(f"\n>>> Running: {script_path}")
-    result = subprocess.run([sys.executable, str(script_path)], cwd=str(BASE_DIR))
-    if result.returncode != 0:
-        raise RuntimeError(f"Step failed: {script_path}")
+    df = build_upcoming_inference_frame(on_date=today)
+    if df.empty:
+        print("No games scheduled today.")
+        return df
+
+    df = _attach_odds(df, DEFAULT_ODDS_PATH)
+
+    feature_names = load_feature_names()
+    model = load_model()
+    X = align_X(df, feature_names)
+    df["predicted_home_win_prob"] = model.predict_proba(X)[:, 1]
+    df = _compute_edges(df)
+
+    # save slim predictions CSV
+    slim = _build_slim_table(df)
+    DEFAULT_PREDICTIONS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    slim.to_csv(DEFAULT_PREDICTIONS_PATH, index=False)
+    print(f"\nSaved predictions to {DEFAULT_PREDICTIONS_PATH} ({len(slim)} rows)\n")
+    _print_predictions(slim)
+
+    return df
+
+
+def push_to_api(df: pd.DataFrame) -> None:
+    """Format prediction rows as GameEntity JSON and POST batch to the API."""
+    payload = []
+    for _, row in df.iterrows():
+        model_prob = float(row.get("predicted_home_win_prob", 0.5))
+
+        if model_prob >= 0.50:
+            predicted_winner = str(row["home_team"])
+            confidence = round(model_prob * 100, 1)
+            _ml = row.get("home_moneyline")
+            odds = 0.0 if pd.isna(_ml) else float(_ml)
+            _sp = row.get("home_spread")
+            spread = 0.0 if pd.isna(_sp) else float(_sp)
+        else:
+            predicted_winner = str(row["away_team"])
+            confidence = round((1.0 - model_prob) * 100, 1)
+            _ml = row.get("away_moneyline")
+            odds = 0.0 if pd.isna(_ml) else float(_ml)
+            _sp = row.get("away_spread")
+            spread = 0.0 if pd.isna(_sp) else float(_sp)
+
+        raw_time = row.get("game_time_utc")
+        if pd.isna(raw_time) or raw_time == "":
+            game_time = f"{row.get('date', '2026-01-01')}T00:00:00"
+        else:
+            game_time = str(raw_time).replace("Z", "")
+
+        def _f(key):
+            v = row.get(key)
+            return 0.0 if pd.isna(v) else float(v)
+
+        factors = {
+            "edge": _f("edge"),
+            "home_implied_prob": _f("home_implied_prob"),
+            "away_implied_prob": _f("away_implied_prob"),
+        }
+
+        payload.append({
+            "gameTime": game_time,
+            "homeTeamId": str(row["home_team_id"]),
+            "awayTeamId": str(row["away_team_id"]),
+            "homeTeamName": str(row["home_team"]),
+            "awayTeamName": str(row["away_team"]),
+            "predictedWinner": predicted_winner,
+            "confidence": confidence,
+            "spread": spread,
+            "odds": odds,
+            "predictiveFactors": json.dumps(factors),
+        })
+
+    print(f"\nSending {len(payload)} predictions to {API_URL} ...")
+    try:
+        resp = requests.post(API_URL, json=payload, headers={"Content-Type": "application/json"})
+        if resp.status_code in (200, 201):
+            print("Success — saved to database.")
+        else:
+            print(f"API returned {resp.status_code}: {resp.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"API connection error: {e}")
 
 
 def main():
-    print("Starting Daily Prediction Pipeline...")
-
-    # Step 1: Pull games for the day (Schedule, Odds, Matchups, Pitcher Stats)
-    data_steps = [
-        FETCH_DIR / "fetch_schedule.py",
-        FETCH_DIR / "fetch_odds.py",
-        FETCH_DIR / "match_odds_to_games.py",
-        FETCH_DIR / "build_odds_features.py",
-        FETCH_DIR / "build_upcoming_dataset.py",
-        FETCH_DIR / "fetch_pitcher_stats.py",
-        ]
-
-    # Make predictions and POST the batch to the Spring Boot API
-    prediction_steps = [
-        SCRIPTS_DIR / "predict_upcoming_games.py",
-        ]
-
-    # Combine into a single execution list
-    steps = data_steps + prediction_steps
-
-    print(f"Total steps: {len(steps)}")
-
-    for step in steps:
-        run_script(step)
-
-    print("\nDaily Prediction Pipeline completed successfully.")
+    df = predict_today()
+    if df.empty:
+        return
+    push_to_api(df)
+    print("\nDaily pipeline complete.")
 
 
 if __name__ == "__main__":

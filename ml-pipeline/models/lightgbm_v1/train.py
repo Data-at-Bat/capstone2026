@@ -1,15 +1,44 @@
+"""Train LightGBM home-win model; save model + feature list for prediction."""
+
+from __future__ import annotations
+
 import argparse
-import os
+import json
+from pathlib import Path
+
 import joblib
 import lightgbm as lgb
+import numpy as np
 import pandas as pd
-from sklearn.metrics import log_loss
+from sklearn.metrics import accuracy_score, log_loss
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DATA_PATH = os.path.join(BASE_DIR, "data", "processed", "model_dataset.csv")
-PITCHER_STATS_PATH = os.path.join(BASE_DIR, "data", "raw", "pitcher_stats.csv")
-MODEL_DIR = os.path.join(BASE_DIR, "models", "lightgbm_v1")
-MODEL_PATH = os.path.join(MODEL_DIR, "model.pkl")
+ML_PIPELINE_ROOT = Path(__file__).resolve().parent.parent.parent
+PROCESSED_DIR = ML_PIPELINE_ROOT / "data" / "processed"
+ARTIFACT_DIR = Path(__file__).resolve().parent / "artifacts"
+
+DEFAULT_UNIFIED_PATH = PROCESSED_DIR / "unified_all.csv"
+MODEL_PATH = ARTIFACT_DIR / "home_win_lgbm.joblib"
+FEATURE_NAMES_PATH = ARTIFACT_DIR / "feature_names.json"
+
+TRAIN_END_SEASON = 2022
+TEST_START_SEASON = 2023
+
+DROP_COLS = [
+    "game_id",
+    "date",
+    "season",
+    "home_team",
+    "away_team",
+    "home_team_id",
+    "away_team_id",
+    "home_team_fg",
+    "away_team_fg",
+    "home_pitcher_id",
+    "away_pitcher_id",
+    "home_score",
+    "away_score",
+    "home_win",
+]
 
 BASE_FEATURE_COLUMNS = [
     "home_team_id",
@@ -29,172 +58,93 @@ FULL_FEATURE_COLUMNS = BASE_FEATURE_COLUMNS + [
     "away_last10_win_pct",
 ]
 
-def load_data():
-    df = pd.read_csv(DATA_PATH)
+def load_unified(path: Path | None = None) -> pd.DataFrame:
+    p = path or DEFAULT_UNIFIED_PATH
+    df = pd.read_csv(p)
+    df["date"] = pd.to_datetime(df["date"])
     return df
 
 
-def add_pitcher_features(df):
-    pitcher_stats = pd.read_csv(PITCHER_STATS_PATH)
-    pitcher_stats = pitcher_stats[["pitcher_id", "era", "whip"]].copy()
-    pitcher_stats["pitcher_id"] = pd.to_numeric(pitcher_stats["pitcher_id"], errors="coerce")
-    pitcher_stats["era"] = pd.to_numeric(pitcher_stats["era"], errors="coerce")
-    pitcher_stats["whip"] = pd.to_numeric(pitcher_stats["whip"], errors="coerce")
-
-    home_stats = pitcher_stats.rename(
-        columns={
-            "pitcher_id": "home_pitcher_id",
-            "era": "home_pitcher_era",
-            "whip": "home_pitcher_whip",
-        }
-    )
-    away_stats = pitcher_stats.rename(
-        columns={
-            "pitcher_id": "away_pitcher_id",
-            "era": "away_pitcher_era",
-            "whip": "away_pitcher_whip",
-        }
-    )
-
-    df = df.merge(home_stats, on="home_pitcher_id", how="left")
-    df = df.merge(away_stats, on="away_pitcher_id", how="left")
-
-    for col in ["home_pitcher_era", "away_pitcher_era", "home_pitcher_whip", "away_pitcher_whip"]:
-        df[col] = df[col].fillna(df[col].median())
-
-    return df
-
-
-def add_team_form_features(df):
-    games = df[["game_id", "date", "home_team", "away_team", "home_win"]].copy()
-    games["home_win"] = pd.to_numeric(games["home_win"], errors="coerce")
-    games = games.dropna(subset=["home_win"])
-
-    home_rows = games.rename(columns={"home_team": "team"})
-    home_rows["win"] = home_rows["home_win"]
-    home_rows["is_home"] = 1
-
-    away_rows = games.rename(columns={"away_team": "team"})
-    away_rows["win"] = 1 - away_rows["home_win"]
-    away_rows["is_home"] = 0
-
-    team_games = pd.concat([home_rows, away_rows], ignore_index=True)
-    team_games = team_games.sort_values(["team", "date", "game_id"])
-
-    # Use only prior games for each team to avoid leakage.
-    team_games["games_before"] = team_games.groupby("team").cumcount()
-    team_games["wins_before"] = team_games.groupby("team")["win"].cumsum() - team_games["win"]
-    team_games["team_win_pct"] = team_games["wins_before"] / team_games["games_before"]
-    team_games["team_win_pct"] = team_games["team_win_pct"].fillna(0.5)
-
-    team_games["last10_win_pct"] = (
-        team_games.groupby("team")["win"]
-        .transform(lambda s: s.shift(1).rolling(window=10, min_periods=1).mean())
-        .fillna(0.5)
-    )
-
-    home_feats = (
-        team_games[team_games["is_home"] == 1][["game_id", "team_win_pct", "last10_win_pct"]]
-        .rename(
-            columns={
-                "team_win_pct": "home_team_win_pct",
-                "last10_win_pct": "home_last10_win_pct",
-            }
-        )
-    )
-    away_feats = (
-        team_games[team_games["is_home"] == 0][["game_id", "team_win_pct", "last10_win_pct"]]
-        .rename(
-            columns={
-                "team_win_pct": "away_team_win_pct",
-                "last10_win_pct": "away_last10_win_pct",
-            }
-        )
-    )
-
-    df = df.merge(home_feats, on="game_id", how="left")
-    df = df.merge(away_feats, on="game_id", how="left")
-
-    for col in [
-        "home_team_win_pct",
-        "away_team_win_pct",
-        "home_last10_win_pct",
-        "away_last10_win_pct",
-    ]:
-        df[col] = df[col].fillna(0.5)
-
-    return df
-
-
-def prepare_features(df, feature_columns):
-    missing = [col for col in feature_columns if col not in df.columns]
-    if missing:
-        raise ValueError(f"Missing feature columns: {missing}")
-    X = df[feature_columns]
-
+def prepare_features(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
+    X = df.drop(columns=[c for c in DROP_COLS if c in df.columns])
     y = df["home_win"]
-
     return X, y
 
 
-def train(feature_set="full12", n_estimators=150, num_leaves=15, learning_rate=0.05):
+def feature_columns_for_prediction(df: pd.DataFrame) -> list[str]:
+    """Column names the model expects (same as training X)."""
+    return [c for c in df.columns if c not in DROP_COLS]
 
-    df = load_data()
-    df = add_pitcher_features(df)
-    df = add_team_form_features(df)
-    df["date"] = pd.to_datetime(df["date"], errors="coerce")
-    df = df.dropna(subset=["date"]).sort_values("date").reset_index(drop=True)
 
-    feature_columns = FULL_FEATURE_COLUMNS if feature_set == "full12" else BASE_FEATURE_COLUMNS
-    X, y = prepare_features(df, feature_columns)
+def align_X(df: pd.DataFrame, feature_names: list[str]) -> pd.DataFrame:
+    """Build X with the same columns as training; missing columns become NaN."""
+    return pd.DataFrame(
+        {c: df[c] if c in df.columns else np.nan for c in feature_names},
+        index=df.index,
+    )
 
-    split_idx = int(len(df) * 0.8)
-    if split_idx <= 0 or split_idx >= len(df):
-        raise ValueError("Not enough rows for time-based train/test split.")
 
-    X_train = X.iloc[:split_idx]
-    y_train = y.iloc[:split_idx]
-    X_test = X.iloc[split_idx:]
-    y_test = y.iloc[split_idx:]
+def train(
+    unified_path: Path | None = None,
+    *,
+    train_end_season: int = TRAIN_END_SEASON,
+    test_start_season: int = TEST_START_SEASON,
+    save: bool = True,
+    model_path: Path | None = None,
+    feature_names_path: Path | None = None,
+) -> tuple[lgb.LGBMClassifier, dict]:
+    df = load_unified(unified_path)
 
-    train_start = df["date"].iloc[0].date()
-    train_end = df["date"].iloc[split_idx - 1].date()
-    test_start = df["date"].iloc[split_idx].date()
-    test_end = df["date"].iloc[-1].date()
+    train_mask = df["season"] <= train_end_season
+    test_mask = df["season"] >= test_start_season
+
+    train_df = df[train_mask].copy()
+    test_df = df[test_mask].copy()
+
+    print(f"Train: {len(train_df)} games (seasons <= {train_end_season})")
+    print(f"Test:  {len(test_df)} games (seasons >= {test_start_season})")
+
+    X_train, y_train = prepare_features(train_df)
+    X_test, y_test = prepare_features(test_df)
+
+    feature_names = list(X_train.columns)
 
     model = lgb.LGBMClassifier(
-        n_estimators=n_estimators,
-        learning_rate=learning_rate,
-        num_leaves=num_leaves
+        n_estimators=500,
+        learning_rate=0.05,
+        num_leaves=31,
+        verbose=-1,
     )
+    model.fit(X_train, y_train)
 
-    model.fit(
-        X_train,
-        y_train,
-        categorical_feature=[
-            "home_team_id",
-            "away_team_id",
-            "home_pitcher_id",
-            "away_pitcher_id"
-        ]
-    )
+    y_pred = model.predict(X_test)
+    y_prob = model.predict_proba(X_test)[:, 1]
 
-    accuracy = model.score(X_test, y_test)
-    test_probs = model.predict_proba(X_test)[:, 1]
-    test_log_loss = log_loss(y_test, test_probs)
+    acc = accuracy_score(y_test, y_pred)
+    ll = log_loss(y_test, y_prob)
 
-    print(f"Train rows: {len(X_train)} | Test rows: {len(X_test)}")
-    print(f"Train range: {train_start} -> {train_end}")
-    print(f"Test range:  {test_start} -> {test_end}")
-    print(f"Feature set: {feature_set} ({len(feature_columns)} features)")
-    print(
-        "Model params: "
-        f"n_estimators={n_estimators}, num_leaves={num_leaves}, learning_rate={learning_rate}"
-    )
-    print(f"Accuracy: {accuracy:.4f}")
-    print(f"Log loss: {test_log_loss:.4f}")
+    print(f"\nAccuracy: {acc:.4f}")
+    print(f"Log-loss: {ll:.4f}")
 
-    return model
+    importances = pd.Series(
+        model.feature_importances_, index=X_train.columns
+    ).sort_values(ascending=False)
+    print("\nTop 10 features:")
+    for feat, imp in importances.head(10).items():
+        print(f"  {feat:40s} {imp}")
+
+    metrics = {"accuracy": acc, "log_loss": ll}
+
+    if save:
+        mp = model_path or MODEL_PATH
+        fp = feature_names_path or FEATURE_NAMES_PATH
+        mp.parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump(model, mp)
+        fp.write_text(json.dumps(feature_names, indent=2), encoding="utf-8")
+        print(f"\nSaved model to {mp}")
+        print(f"Saved feature list ({len(feature_names)} cols) to {fp}")
+
+    return model, metrics
 
 
 def parse_args():
@@ -210,16 +160,5 @@ def parse_args():
     parser.add_argument("--learning-rate", type=float, default=0.05)
     return parser.parse_args()
 
-    return model
-
 if __name__ == "__main__":
-    args = parse_args()
-    model = train(
-        feature_set=args.feature_set,
-        n_estimators=args.n_estimators,
-        num_leaves=args.num_leaves,
-        learning_rate=args.learning_rate,
-    )
-    os.makedirs(MODEL_DIR, exist_ok=True)
-    joblib.dump(model, MODEL_PATH)
-    print(f"Saved model to {MODEL_PATH}")
+    train()

@@ -1,13 +1,9 @@
 import pandas as pd
 import os
-import sys
-
-# Define the base directory first
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-sys.path.append(BASE_DIR)
 
 from config.team_mapping import MLB_NAME_TO_FG
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 RAW_DIR = os.path.join(BASE_DIR, "data", "raw")
 PROCESSED_DIR = os.path.join(BASE_DIR, "data", "processed")
