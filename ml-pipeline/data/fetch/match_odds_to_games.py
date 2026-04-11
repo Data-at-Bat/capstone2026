@@ -25,28 +25,23 @@ def preprocess(schedule, odds):
     odds["home_team"] = odds["home_team"].apply(normalize_team)
     odds["away_team"] = odds["away_team"].apply(normalize_team)
 
-    schedule["date"] = pd.to_datetime(schedule["date"])
-    odds["commence_time"] = pd.to_datetime(odds["commence_time"], utc=True)
+    schedule["game_time"] = pd.to_datetime(schedule["game_time_utc"], format="mixed", utc=True)
+    odds["commence_time"] = pd.to_datetime(odds["commence_time"], format="mixed", utc=True)
 
-    odds["odds_date"] = odds["commence_time"].dt.tz_convert(None).dt.normalize()
-    schedule["schedule_date"] = schedule["date"].dt.normalize()
     return schedule, odds
 
-def match(schedule, odds):
 
+def match(schedule, odds):
     merged = odds.merge(
         schedule,
         on=["home_team", "away_team"],
         how="left"
     )
 
-    merged["date_diff_days"] = (
-            merged["schedule_date"] - merged["odds_date"]
-    ).abs().dt.days
+    merged["time_diff_hours"] = (
+                                        merged["game_time"] - merged["commence_time"]
+                                ).abs().dt.total_seconds() / 3600.0
 
-
-    # .first(), it will automatically grab the value
-    # from the first valid match in the schedule.
     group_cols = [
         "commence_time",
         "home_team",
@@ -58,13 +53,15 @@ def match(schedule, odds):
         "point"
     ]
 
-    merged = merged[merged["date_diff_days"] <= 1]
-    merged = merged.sort_values("date_diff_days")
+    # Only keep candidate games within 12 hours of the odds time
+    # (This handles double-headers and weather delays safely)
+    merged = merged[merged["time_diff_hours"] <= 12]
 
-    best_match = (
-        merged.groupby(group_cols, dropna=False, as_index=False)
-        .first() # This will now keep game_time_utc
-    )
+    # Sort so the game happening at the EXACT same time is at the top
+    merged = merged.sort_values("time_diff_hours")
+
+    # Strictly grab the single closest game to prevent duplicates
+    best_match = merged.drop_duplicates(subset=group_cols, keep="first")
 
     return best_match
 

@@ -90,9 +90,11 @@ class GameListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String formattedTime = DateFormat.jm().format(game.gameTime);
-    bool isTrueValueBet = game.odds > 0;
-    bool isTrueLargeValue = isTrueValueBet && game.confidence >= 65.0;
+    // Formats to: "April 10, 7:00 PM"
+    final String formattedDateTime = DateFormat('MMMM d, h:mm a').format(game.gameTime);
+
+    // Any game with a positive edge is treated as a consistent value bet
+    bool isValueBet = game.odds > 0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
@@ -100,7 +102,11 @@ class GameListItem extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 15, offset: const Offset(0, 5)),
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 15,
+              offset: const Offset(0, 5)
+          ),
         ],
       ),
       child: Material(
@@ -109,26 +115,47 @@ class GameListItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           onTap: () {
             try {
-              LoggerService.logEvent(fileName: 'daily_predictions_screen.dart', functionName: 'onGameClicked(${game.gameId})', outcome: 'Success');
-              Navigator.push(context, MaterialPageRoute(builder: (context) => GameDetailScreen(gameData: game, userId: '')));
+              LoggerService.logEvent(
+                  fileName: 'daily_predictions_screen.dart',
+                  functionName: 'onGameClicked(${game.gameId})',
+                  outcome: 'Success'
+              );
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GameDetailScreen(gameData: game, userId: ''))
+              );
             } catch (e) {
-              LoggerService.logEvent(fileName: 'daily_predictions_screen.dart', functionName: 'onGameClicked', outcome: 'Failure: ${e.toString()}');
+              LoggerService.logEvent(
+                  fileName: 'daily_predictions_screen.dart',
+                  functionName: 'onGameClicked',
+                  outcome: 'Failure: ${e.toString()}'
+              );
             }
           },
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                // Top Row: Time
+                // Top Row: Date and Time
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(20)),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                      color: const Color(0xFF462255).withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(20)
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.schedule, size: 14, color: Color(0xFF462255)),
-                      const SizedBox(width: 6),
-                      Text(formattedTime, style: const TextStyle(color: Color(0xFF462255), fontWeight: FontWeight.bold, fontSize: 12)),
+                      const Icon(Icons.calendar_today, size: 14, color: Color(0xFF462255)),
+                      const SizedBox(width: 8),
+                      Text(
+                          formattedDateTime,
+                          style: const TextStyle(
+                              color: Color(0xFF462255),
+                              fontWeight: FontWeight.w800,
+                              fontSize: 14
+                          )
+                      ),
                     ],
                   ),
                 ),
@@ -155,9 +182,10 @@ class GameListItem extends StatelessWidget {
                   ],
                 ),
 
-                if (isTrueValueBet) ...[
+                // Value Bet Banner (Consistently Green)
+                if (isValueBet) ...[
                   const SizedBox(height: 24),
-                  _buildValueBetArea(isLargeEdge: isTrueLargeValue),
+                  _buildValueBetArea(),
                 ]
               ],
             ),
@@ -178,7 +206,7 @@ class GameListItem extends StatelessWidget {
         Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
         const SizedBox(height: 12),
 
-        // UPGRADED: Larger Circle & Stronger Glow
+        // Larger Circle & Stronger Glow
         Container(
           width: 85,
           height: 85,
@@ -187,15 +215,15 @@ class GameListItem extends StatelessWidget {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                  color: teamColor.withValues(alpha: 0.4), // Stronger, more opaque glow
-                  blurRadius: 20,                          // Wider blur spread
-                  spreadRadius: 4                          // Pushes the glow further out
+                  color: teamColor.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  spreadRadius: 4
               )
             ],
             border: Border.all(color: teamColor.withValues(alpha: 0.2), width: 2),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(16.0), // Scaled padding for the larger circle
+            padding: const EdgeInsets.all(16.0),
             child: Image.asset(
               'assets/logos/$teamAbbr.png',
               fit: BoxFit.contain,
@@ -218,23 +246,28 @@ class GameListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildValueBetArea({required bool isLargeEdge}) {
+  Widget _buildValueBetArea() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: isLargeEdge ? Colors.green.shade50 : Colors.blue.shade50,
+        color: Colors.green.shade50,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isLargeEdge ? Colors.green.shade400 : Colors.blue.shade300, width: 1.5),
+        border: Border.all(color: Colors.green.shade400, width: 1.5),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(isLargeEdge ? Icons.local_fire_department : Icons.trending_up, color: isLargeEdge ? Colors.green.shade700 : Colors.blue.shade700, size: 18),
+          Icon(Icons.local_fire_department, color: Colors.green.shade700, size: 20),
           const SizedBox(width: 8),
           Text(
-            isLargeEdge ? "LARGE VALUE EDGE" : "VALUE PICK",
-            style: TextStyle(fontWeight: FontWeight.w900, color: isLargeEdge ? Colors.green.shade700 : Colors.blue.shade700, letterSpacing: 0.5, fontSize: 12),
+            "VALUE EDGE DETECTED",
+            style: TextStyle(
+                fontWeight: FontWeight.w900,
+                color: Colors.green.shade700,
+                letterSpacing: 0.5,
+                fontSize: 13
+            ),
           ),
         ],
       ),
