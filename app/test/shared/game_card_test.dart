@@ -8,6 +8,7 @@ import 'package:app/features/daily_predictions/data/repositories/prediction_repo
 import 'package:app/features/daily_predictions/presentation/providers/prediction_provider.dart';
 import 'package:app/features/daily_predictions/presentation/screens/daily_predictions_screen.dart';
 import 'package:app/features/daily_predictions/presentation/screens/game_detail_screen.dart';
+import 'package:app/features/profile/presentation/providers/favorites_provider.dart';
 
 class MockPredictionRepository extends Mock implements PredictionRepository {}
 
@@ -40,15 +41,19 @@ void main() {
 
   Widget createWidgetUnderTest() {
     return ProviderScope(
-      overrides: [predictionRepositoryProvider.overrideWithValue(mockRepo)],
+      overrides: [
+        predictionRepositoryProvider.overrideWithValue(mockRepo),
+        // Mocked favorites provider to instantly return an empty set
+        favoritesProvider.overrideWith((ref) async => <String>{}),
+      ],
       child: const MaterialApp(home: DailyPredictionsPage()),
     );
   }
 
   group('Daily Predictions Page Tests', () {
     testWidgets('Renders empty state when no games are returned', (
-      tester,
-    ) async {
+        tester,
+        ) async {
       when(() => mockRepo.fetchDailyGames()).thenAnswer((_) async => []);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -59,7 +64,7 @@ void main() {
 
     testWidgets('Renders game cards successfully', (tester) async {
       when(
-        () => mockRepo.fetchDailyGames(),
+            () => mockRepo.fetchDailyGames(),
       ).thenAnswer((_) async => [mockGame]);
 
       await tester.pumpWidget(createWidgetUnderTest());
@@ -70,17 +75,17 @@ void main() {
     });
 
     testWidgets('Behavioral: Tapping game card navigates to detail view', (
-      tester,
-    ) async {
+        tester,
+        ) async {
       when(
-        () => mockRepo.fetchDailyGames(),
+            () => mockRepo.fetchDailyGames(),
       ).thenAnswer((_) async => [mockGame]);
 
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      // Tap the card to trigger navigation
-      await tester.tap(find.byType(InkWell).first);
+      // Updated the tap target to strictly look for the GameListItem
+      await tester.tap(find.byType(GameListItem).first);
       await tester.pumpAndSettle();
 
       // --- UI ASSERTIONS FOR THE DETAIL SCREEN ---

@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:app/features/auth/presentation/providers/auth_provider.dart';
 
-const String apiBaseURL = "http://localhost:8080";
+const String apiBaseURL = "http://localhost:8080"; // dataatbat.hopto.org
 
 const Map<String, String> mlbIdToUuid = {
   '144': '0594b0b4-9a5e-4a90-bb4b-324e62a22f3e', // ATL
