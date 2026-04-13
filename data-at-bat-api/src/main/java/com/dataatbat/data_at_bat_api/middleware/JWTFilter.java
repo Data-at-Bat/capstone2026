@@ -1,19 +1,17 @@
 package com.dataatbat.data_at_bat_api.middleware;
 
-import com.google.api.Http;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
-import jakarta.servlet.annotation.WebFilter;
+
 import java.io.IOException;
-import java.util.UUID;
+
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,7 +23,16 @@ public class JWTFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
+        // LET CORS PREFLIGHT REQUESTS PASS THROUGH IMMEDIATELY
+        // This is required for Flutter Web to establish a connection with the server
+        if (httpRequest.getMethod().equalsIgnoreCase("OPTIONS")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // Resume normal JWT checks for all other requests
         if (requiresAuth(httpRequest)) {
             String token = httpRequest.getHeader("Authorization");
 
@@ -36,10 +43,10 @@ public class JWTFilter implements Filter {
                     chain.doFilter(request, response);
                 }
                 catch (FirebaseAuthException exception){
-                    ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token");
+                    httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token");
                 }
             } else {
-                ((HttpServletResponse) response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is missing");
+                httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authorization header is missing");
             }
         }
         else {

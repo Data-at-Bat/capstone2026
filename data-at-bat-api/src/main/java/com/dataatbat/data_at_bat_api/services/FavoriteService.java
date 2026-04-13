@@ -8,10 +8,12 @@ import com.dataatbat.data_at_bat_api.presentation.presentation_models.FavoritesR
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class FavoriteService {
@@ -91,6 +93,23 @@ public class FavoriteService {
             return deleteFavoriteByTeamId(userId, team.getTeamId());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
+        }
+    }
+    @Transactional
+    public ResponseEntity<String> syncFavorites(String userId, List<UUID> teamIds) {
+        try {
+            // Remove existing favorites for this user
+            favoritesRepository.deleteByUserId(userId);
+
+            // Map IDs to new entities and save
+            List<FavoriteEntity> newFavorites = teamIds.stream()
+                    .map(teamId -> new FavoriteEntity(teamId, userId))
+                    .collect(Collectors.toList());
+
+            favoritesRepository.saveAll(newFavorites);
+            return ResponseEntity.ok("Favorites synced successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error syncing favorites: " + e.getMessage());
         }
     }
 }

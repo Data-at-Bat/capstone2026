@@ -14,6 +14,7 @@ public class FilterConfig {
         registrationBean.setFilter(new JWTFilter());
         registrationBean.addUrlPatterns("/user");
         registrationBean.addUrlPatterns(("/favorites"));
+        registrationBean.addUrlPatterns(("/favorites/*"));
         return registrationBean;
     }
 }
