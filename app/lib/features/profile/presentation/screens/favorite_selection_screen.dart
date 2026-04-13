@@ -72,7 +72,7 @@ class _FavoritesSelectionScreenState extends ConsumerState<FavoritesSelectionScr
           .toList();
 
       final response = await http.post(
-        Uri.parse('$API_BASE_URL/favorites/sync'),
+        Uri.parse('$apiBaseURL/favorites/sync'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
