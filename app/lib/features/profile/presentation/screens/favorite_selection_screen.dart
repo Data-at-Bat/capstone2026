@@ -65,9 +65,6 @@ class _FavoritesSelectionScreenState extends ConsumerState<FavoritesSelectionScr
     try {
       final user = ref.read(authProvider).currentUser;
       final token = await user?.getIdToken();
-      print("===== MY FIREBASE TOKEN =====");
-      print(token);
-      print("=============================");
 
       final List<String> uuids = _selectedMlbIds
           .map((id) => mlbIdToUuid[id])
@@ -180,7 +177,7 @@ class _FavoritesSelectionScreenState extends ConsumerState<FavoritesSelectionScr
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset('assets/logos/$abbr.png', height: 40, errorBuilder: (_, __, ___) => Text(abbr)),
+                Image.asset('assets/logos/$abbr.png', height: 40, errorBuilder: (_, _, _) => Text(abbr)),
                 const SizedBox(height: 8),
                 Text(abbr, style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? const Color(0xFF462255) : Colors.black)),
               ],
