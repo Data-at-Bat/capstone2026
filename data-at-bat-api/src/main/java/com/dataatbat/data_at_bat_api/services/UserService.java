@@ -1,7 +1,7 @@
 package com.dataatbat.data_at_bat_api.services;
 
 import com.dataatbat.data_at_bat_api.domain.UserEntity;
-import com.dataatbat.data_at_bat_api.persistence.repositories.IUserRepository;
+import com.dataatbat.data_at_bat_api.persistence.IUserRepository;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<UserEntity> getUserById(UUID id) {
+    public ResponseEntity<UserEntity> getUserById(String id) {
         return userRepository.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -38,7 +38,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<String> updateUser(UUID id, UserEntity user) {
+    public ResponseEntity<String> updateUser(String id, UserEntity user) {
         try {
             Optional<UserEntity> existing = userRepository.findById(id);
             if (existing.isEmpty()) return ResponseEntity.notFound().build();
@@ -53,7 +53,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<String> deleteUser(UUID id) {
+    public ResponseEntity<String> deleteUser(String id) {
         try {
             if (!userRepository.existsById(id)) return ResponseEntity.notFound().build();
             userRepository.deleteById(id);

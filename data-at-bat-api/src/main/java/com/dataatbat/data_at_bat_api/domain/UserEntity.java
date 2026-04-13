@@ -15,7 +15,7 @@ public class UserEntity {
     @Setter
     @Id
     @Column(name="uid")
-    private UUID uid;
+    private String uid;
 
     @Getter
     @Setter

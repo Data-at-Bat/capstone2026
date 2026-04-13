@@ -1,4 +1,4 @@
-package com.dataatbat.data_at_bat_api.persistence.repositories;
+package com.dataatbat.data_at_bat_api.persistence;
 
 import com.dataatbat.data_at_bat_api.domain.PredictionEntity;
 import org.springframework.data.repository.CrudRepository;

@@ -66,6 +66,7 @@ def _cmd_predict(args: argparse.Namespace) -> None:
         upcoming_csv=Path(args.upcoming_csv) if getattr(args, "upcoming_csv", "") else None,
         prefer_upcoming_file=not getattr(args, "api_schedule", False),
         predict_date=slate_day,
+        predict_days=getattr(args, "predict_days", 1),
     )
 
 
@@ -146,6 +147,12 @@ def main() -> None:
         default="",
         help="Upcoming mode: slate date YYYY-MM-DD (default: today, local date)",
     )
+    pred_p.add_argument(
+        "--predict-days",
+        type=int,
+        default=1,
+        help="Upcoming mode: number of days ahead to predict (default: 1)",
+    )
     pred_p.set_defaults(func=_cmd_predict)
 
     full_p = sub.add_parser("full", help="build + train + predict")
@@ -158,6 +165,7 @@ def main() -> None:
     full_p.add_argument("--upcoming-csv", type=str, default="")
     full_p.add_argument("--api-schedule", action="store_true")
     full_p.add_argument("--predict-date", type=str, default="")
+    full_p.add_argument("--predict-days", type=int, default=1)
     full_p.add_argument("--train-end-season", type=int, default=2022)
     full_p.add_argument("--test-start-season", type=int, default=2023)
     full_p.set_defaults(func=_cmd_full)

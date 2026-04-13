@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/favorites")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
@@ -17,20 +18,30 @@ public class FavoriteController {
         this.favoriteService = favoriteService;
     }
 
-    @PostMapping("/favorite")
-    public ResponseEntity<String> createFavorite(@RequestBody CreateFavoriteRequest request) {
-        return favoriteService.createFavorite(request.teamId(), request.userId());
+    @PostMapping
+    public ResponseEntity<String> createFavorite(@RequestAttribute("uid") String userId, @RequestBody CreateFavoriteRequest request) {
+        if (request.teamAbbreviation() != null) {
+            return favoriteService.createFavorite(request.teamAbbreviation(), userId);
+        }
+        else {
+            return favoriteService.createFavorite(request.teamId(), userId);
+        }
     }
 
-    @GetMapping("/favorites")
-    public ResponseEntity<FavoritesResponse> getFavorites(@RequestParam UUID userId) {
+    @GetMapping
+    public ResponseEntity<FavoritesResponse> getFavorites(@RequestAttribute("uid") String userId) {
         return favoriteService.getFavoritesByUserId(userId);
     }
 
-    @DeleteMapping("/favorites")
-    public ResponseEntity<String> deleteFavorite(@RequestParam UUID id) {
-        return favoriteService.deleteFavorite(id);
+    @DeleteMapping(params="id")
+    public ResponseEntity<String> deleteFavoriteById(@RequestAttribute("uid") String userId, @RequestParam UUID id) {
+        return favoriteService.deleteFavorite(userId, id);
     }
 
-    record CreateFavoriteRequest(UUID userId, UUID teamId) {}
+    @DeleteMapping(params="abbreviation")
+    public ResponseEntity<String> deleteFavoriteByAbbreviation(@RequestAttribute("uid") String userId, @RequestParam String abbreviation) {
+        return favoriteService.deleteFavoriteByAbbreviation(userId, abbreviation);
+    }
+
+    record CreateFavoriteRequest(String userId, UUID teamId, String teamAbbreviation) {}
 }
