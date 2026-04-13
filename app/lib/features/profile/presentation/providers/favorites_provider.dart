@@ -5,7 +5,6 @@ import 'package:app/features/auth/presentation/providers/auth_provider.dart';
 
 const String apiBaseURL = "http://localhost:8080";
 
-// Public map so the selection screen can use it to sync back to the database
 const Map<String, String> mlbIdToUuid = {
   '144': '0594b0b4-9a5e-4a90-bb4b-324e62a22f3e', // ATL
   '137': '0a685da3-334e-451a-9645-0d65b7a1510e', // SF
@@ -39,9 +38,13 @@ const Map<String, String> mlbIdToUuid = {
   '146': 'fb774163-4b6d-47a7-be4c-6246b731656c', // MIA
 };
 
-// Provides a Set of the frontend MLB IDs (e.g., {'144', '137'})
 final favoritesProvider = FutureProvider<Set<String>>((ref) async {
-  final user = ref.read(authProvider).currentUser;
+  // THE FIX: We use ref.watch on the auth state stream!
+  // Now, anytime a user logs in or out, this provider automatically destroys
+  // its cache and recalculates for the new user.
+  final user = ref.watch(authStateProvider).value;
+
+  // If no one is logged in, immediately return an empty set
   if (user == null) return {};
 
   final token = await user.getIdToken();

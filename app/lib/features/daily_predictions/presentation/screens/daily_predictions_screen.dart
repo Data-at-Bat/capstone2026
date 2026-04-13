@@ -7,11 +7,22 @@ import 'package:app/features/profile/presentation/providers/favorites_provider.d
 import 'package:app/shared/logging/logger_service.dart';
 import 'package:app/features/daily_predictions/presentation/screens/game_detail_screen.dart';
 
-class DailyPredictionsPage extends ConsumerWidget {
+// Enum to track our current sorting method
+enum SortMethod { time, value }
+
+class DailyPredictionsPage extends ConsumerStatefulWidget {
   const DailyPredictionsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DailyPredictionsPage> createState() => _DailyPredictionsPageState();
+}
+
+class _DailyPredictionsPageState extends ConsumerState<DailyPredictionsPage> {
+  // Default sort is by time
+  SortMethod _currentSort = SortMethod.time;
+
+  @override
+  Widget build(BuildContext context) {
     final gamesAsyncValue = ref.watch(dailyPredictionsProvider);
     // Read favorites (defaults to empty set if still loading to avoid blocking UI)
     final favoriteTeamIds = ref.watch(favoritesProvider).maybeWhen(
@@ -43,30 +54,85 @@ class DailyPredictionsPage extends ConsumerWidget {
             );
           }
 
-          // Sort games: Favorites first, then by game time
+          // Sort games: Favorites first, then by the selected sort method
           final sortedGames = List.of(games);
           sortedGames.sort((a, b) {
             final aIsFav = favoriteTeamIds.contains(a.homeTeamId) || favoriteTeamIds.contains(a.awayTeamId);
             final bIsFav = favoriteTeamIds.contains(b.homeTeamId) || favoriteTeamIds.contains(b.awayTeamId);
 
+            // 1. Favorites always go to the top
             if (aIsFav && !bIsFav) return -1;
             if (!aIsFav && bIsFav) return 1;
 
-            // If both are favorites or neither are, sort chronologically
-            return a.gameTime.compareTo(b.gameTime);
+            // 2. If both are favorites or neither are, apply the user's selected sort
+            if (_currentSort == SortMethod.value) {
+              // Sort by value edge (descending: highest edge first)
+              return b.odds.compareTo(a.odds);
+            } else {
+              // Sort by time (ascending: earliest first)
+              return a.gameTime.compareTo(b.gameTime);
+            }
           });
 
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            itemCount: sortedGames.length,
-            itemBuilder: (context, index) {
-              final game = sortedGames[index];
-              return GameListItem(
-                game: game,
-                isHomeFavorited: favoriteTeamIds.contains(game.homeTeamId),
-                isAwayFavorited: favoriteTeamIds.contains(game.awayTeamId),
-              );
-            },
+          return Column(
+            children: [
+              // Sorting Toggle Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${sortedGames.length} Games Today",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade600, fontSize: 14),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<SortMethod>(
+                          value: _currentSort,
+                          icon: const Icon(Icons.sort, color: Color(0xFF462255), size: 18),
+                          isDense: true,
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF462255), fontSize: 13),
+                          items: const [
+                            DropdownMenuItem(value: SortMethod.time, child: Text("Sort by Time")),
+                            DropdownMenuItem(value: SortMethod.value, child: Text("Sort by Value")),
+                          ],
+                          onChanged: (SortMethod? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                _currentSort = newValue;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Games List
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+                  itemCount: sortedGames.length,
+                  itemBuilder: (context, index) {
+                    final game = sortedGames[index];
+                    return GameListItem(
+                      game: game,
+                      isHomeFavorited: favoriteTeamIds.contains(game.homeTeamId),
+                      isAwayFavorited: favoriteTeamIds.contains(game.awayTeamId),
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF462255))),
