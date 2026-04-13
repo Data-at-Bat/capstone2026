@@ -39,7 +39,6 @@ const Map<String, String> mlbIdToUuid = {
 };
 
 final favoritesProvider = FutureProvider<Set<String>>((ref) async {
-  // THE FIX: We use ref.watch on the auth state stream!
   // Now, anytime a user logs in or out, this provider automatically destroys
   // its cache and recalculates for the new user.
   final user = ref.watch(authStateProvider).value;
