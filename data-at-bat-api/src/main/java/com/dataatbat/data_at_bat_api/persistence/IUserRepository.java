@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 
-public interface IUserRepository extends CrudRepository<UserEntity, UUID>{
+public interface IUserRepository extends CrudRepository<UserEntity, String>{
     List<UserEntity> findByEmail(String email);
     // Returns all users with a given subscription status
     List<UserEntity> findBySubscriptionStatus(Boolean subscriptionStatus);

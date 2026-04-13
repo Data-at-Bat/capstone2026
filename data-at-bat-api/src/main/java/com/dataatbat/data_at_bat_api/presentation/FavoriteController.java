@@ -17,20 +17,30 @@ public class FavoriteController {
         this.favoriteService = favoriteService;
     }
 
-    @PostMapping("/favorite")
-    public ResponseEntity<String> createFavorite(@RequestBody CreateFavoriteRequest request) {
-        return favoriteService.createFavorite(request.teamId(), request.userId());
+    @PostMapping("/favorites")
+    public ResponseEntity<String> createFavorite(@RequestAttribute("uid") String userId, @RequestBody CreateFavoriteRequest request) {
+        if (request.teamAbbreviation() != null) {
+            return favoriteService.createFavorite(request.teamAbbreviation(), userId);
+        }
+        else {
+            return favoriteService.createFavorite(request.teamId(), userId);
+        }
     }
 
     @GetMapping("/favorites")
-    public ResponseEntity<FavoritesResponse> getFavorites(@RequestParam UUID userId) {
+    public ResponseEntity<FavoritesResponse> getFavorites(@RequestAttribute("uid") String userId) {
         return favoriteService.getFavoritesByUserId(userId);
     }
 
     @DeleteMapping("/favorites")
-    public ResponseEntity<String> deleteFavorite(@RequestParam UUID id) {
-        return favoriteService.deleteFavorite(id);
+    public ResponseEntity<String> deleteFavorite(@RequestAttribute("uid") String userId, @RequestParam UUID id) {
+        return favoriteService.deleteFavorite(userId, id);
     }
 
-    record CreateFavoriteRequest(UUID userId, UUID teamId) {}
+    @DeleteMapping("/favorites")
+    public ResponseEntity<String> deleteFavorite(@RequestAttribute("uid") String userId, @RequestParam String abbreviation) {
+        return favoriteService.deleteFavoriteByAbbreviation(userId, abbreviation);
+    }
+
+    record CreateFavoriteRequest(String userId, UUID teamId, String teamAbbreviation) {}
 }

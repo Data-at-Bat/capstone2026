@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.List;
 
 public interface IFavoritesRepository extends CrudRepository<FavoriteEntity, UUID> {
-    List<FavoriteEntity> findByUserId(UUID userId);
+    List<FavoriteEntity> findByUserId(String userId);
     List<FavoriteEntity> findByTeamId(UUID teamId);
+    FavoriteEntity findByUserIdAndTeamId(String userId, UUID teamId);
+    void deleteByUserIdAndTeamId(String userId, UUID teamId);
 }
