@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/favorites")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
@@ -17,7 +18,7 @@ public class FavoriteController {
         this.favoriteService = favoriteService;
     }
 
-    @PostMapping("/favorites")
+    @PostMapping
     public ResponseEntity<String> createFavorite(@RequestAttribute("uid") String userId, @RequestBody CreateFavoriteRequest request) {
         if (request.teamAbbreviation() != null) {
             return favoriteService.createFavorite(request.teamAbbreviation(), userId);
@@ -27,18 +28,18 @@ public class FavoriteController {
         }
     }
 
-    @GetMapping("/favorites")
+    @GetMapping
     public ResponseEntity<FavoritesResponse> getFavorites(@RequestAttribute("uid") String userId) {
         return favoriteService.getFavoritesByUserId(userId);
     }
 
-    @DeleteMapping("/favorites")
-    public ResponseEntity<String> deleteFavorite(@RequestAttribute("uid") String userId, @RequestParam UUID id) {
+    @DeleteMapping(params="id")
+    public ResponseEntity<String> deleteFavoriteById(@RequestAttribute("uid") String userId, @RequestParam UUID id) {
         return favoriteService.deleteFavorite(userId, id);
     }
 
-    @DeleteMapping("/favorites")
-    public ResponseEntity<String> deleteFavorite(@RequestAttribute("uid") String userId, @RequestParam String abbreviation) {
+    @DeleteMapping(params="abbreviation")
+    public ResponseEntity<String> deleteFavoriteByAbbreviation(@RequestAttribute("uid") String userId, @RequestParam String abbreviation) {
         return favoriteService.deleteFavoriteByAbbreviation(userId, abbreviation);
     }
 

@@ -18,7 +18,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<UserEntity> getUser(@RequestAttribute("uid") UUID id) {
+    public ResponseEntity<UserEntity> getUser(@RequestAttribute("uid") String id) {
         return userService.getUserById(id);
     }
 
@@ -28,12 +28,12 @@ public class UserController {
     }
 
     @PatchMapping
-    public ResponseEntity<String> updateUser(@RequestAttribute("uid") UUID id, @RequestBody UserEntity user) {
+    public ResponseEntity<String> updateUser(@RequestAttribute("uid") String id, @RequestBody UserEntity user) {
         return userService.updateUser(id, user);
     }
 
     @DeleteMapping
-    public ResponseEntity<String> deleteUser(@RequestAttribute("uid") UUID id) {
+    public ResponseEntity<String> deleteUser(@RequestAttribute("uid") String id) {
         return userService.deleteUser(id);
     }
 }
