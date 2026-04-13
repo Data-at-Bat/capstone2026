@@ -22,11 +22,11 @@ public class FavoriteEntity {
     @Getter
     @Setter
     @Column(name="user_id", nullable = false)
-    private UUID userId;
+    private String userId;
 
     protected FavoriteEntity() {}
 
-    public FavoriteEntity(UUID team_Id, UUID user_Id) {
+    public FavoriteEntity(UUID team_Id, String user_Id) {
         teamId = team_Id;
         userId = user_Id;
     }

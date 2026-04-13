@@ -1,7 +1,7 @@
 package com.dataatbat.data_at_bat_api.services;
 
 import com.dataatbat.data_at_bat_api.domain.GameEntity;
-import com.dataatbat.data_at_bat_api.persistence.repositories.IGamesRepository;
+import com.dataatbat.data_at_bat_api.persistence.IGamesRepository;
 import com.dataatbat.data_at_bat_api.presentation.presentation_models.GameResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;

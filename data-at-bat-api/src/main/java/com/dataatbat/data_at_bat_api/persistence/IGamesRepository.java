@@ -1,4 +1,4 @@
-package com.dataatbat.data_at_bat_api.persistence.repositories;
+package com.dataatbat.data_at_bat_api.persistence;
 
 import com.dataatbat.data_at_bat_api.domain.GameEntity;
 import org.springframework.data.jpa.repository.Query;

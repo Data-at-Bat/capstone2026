@@ -1,9 +1,7 @@
 package com.dataatbat.data_at_bat_api.presentation;
 
 import com.dataatbat.data_at_bat_api.domain.TeamEntity;
-import com.dataatbat.data_at_bat_api.persistence.repositories.ITeamsRepository;
 import com.dataatbat.data_at_bat_api.services.TeamService;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;

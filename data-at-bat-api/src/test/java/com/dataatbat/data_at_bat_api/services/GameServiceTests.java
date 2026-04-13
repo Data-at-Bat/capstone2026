@@ -1,8 +1,7 @@
 package com.dataatbat.data_at_bat_api.services;
 
 import com.dataatbat.data_at_bat_api.domain.GameEntity;
-import com.dataatbat.data_at_bat_api.persistence.repositories.IGamesRepository;
-import com.dataatbat.data_at_bat_api.presentation.presentation_models.GameResponse;
+import com.dataatbat.data_at_bat_api.persistence.IGamesRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
