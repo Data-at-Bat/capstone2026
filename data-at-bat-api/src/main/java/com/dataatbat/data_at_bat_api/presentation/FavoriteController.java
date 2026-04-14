@@ -1,11 +1,11 @@
 package com.dataatbat.data_at_bat_api.presentation;
 
-import com.dataatbat.data_at_bat_api.domain.FavoriteEntity;
 import com.dataatbat.data_at_bat_api.presentation.presentation_models.FavoritesResponse;
 import com.dataatbat.data_at_bat_api.services.FavoriteService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -43,5 +43,11 @@ public class FavoriteController {
         return favoriteService.deleteFavoriteByAbbreviation(userId, abbreviation);
     }
 
+    @PostMapping("/sync")
+    public ResponseEntity<String> syncFavorites(@RequestAttribute("uid") String userId, @RequestBody SyncFavoritesRequest request) {
+        return favoriteService.syncFavorites(userId, request.teamIds());
+    }
+
+    record SyncFavoritesRequest(List<UUID> teamIds) {}
     record CreateFavoriteRequest(String userId, UUID teamId, String teamAbbreviation) {}
 }

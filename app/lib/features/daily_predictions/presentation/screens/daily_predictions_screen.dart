@@ -3,18 +3,35 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:app/models/game_matchup.dart';
 import 'package:app/features/daily_predictions/presentation/providers/prediction_provider.dart';
+import 'package:app/features/profile/presentation/providers/favorites_provider.dart';
 import 'package:app/shared/logging/logger_service.dart';
 import 'package:app/features/daily_predictions/presentation/screens/game_detail_screen.dart';
 
-class DailyPredictionsPage extends ConsumerWidget {
+// Enum to track our current sorting method
+enum SortMethod { time, value }
+
+class DailyPredictionsPage extends ConsumerStatefulWidget {
   const DailyPredictionsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<DailyPredictionsPage> createState() => _DailyPredictionsPageState();
+}
+
+class _DailyPredictionsPageState extends ConsumerState<DailyPredictionsPage> {
+  // Default sort is by time
+  SortMethod _currentSort = SortMethod.time;
+
+  @override
+  Widget build(BuildContext context) {
     final gamesAsyncValue = ref.watch(dailyPredictionsProvider);
+    // Read favorites (defaults to empty set if still loading to avoid blocking UI)
+    final favoriteTeamIds = ref.watch(favoritesProvider).maybeWhen(
+      data: (data) => data,
+      orElse: () => <String>{},
+    );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FA), // Brighter, cleaner background
+      backgroundColor: const Color(0xFFF4F7FA),
       appBar: AppBar(
         title: const Text('Daily Predictions', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.5)),
         backgroundColor: const Color(0xFF462255),
@@ -37,10 +54,85 @@ class DailyPredictionsPage extends ConsumerWidget {
             );
           }
 
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            itemCount: games.length,
-            itemBuilder: (context, index) => GameListItem(game: games[index]),
+          // Sort games: Favorites first, then by the selected sort method
+          final sortedGames = List.of(games);
+          sortedGames.sort((a, b) {
+            final aIsFav = favoriteTeamIds.contains(a.homeTeamId) || favoriteTeamIds.contains(a.awayTeamId);
+            final bIsFav = favoriteTeamIds.contains(b.homeTeamId) || favoriteTeamIds.contains(b.awayTeamId);
+
+            // 1. Favorites always go to the top
+            if (aIsFav && !bIsFav) return -1;
+            if (!aIsFav && bIsFav) return 1;
+
+            // 2. If both are favorites or neither are, apply the user's selected sort
+            if (_currentSort == SortMethod.value) {
+              // Sort by value edge (descending: highest edge first)
+              return b.odds.compareTo(a.odds);
+            } else {
+              // Sort by time (ascending: earliest first)
+              return a.gameTime.compareTo(b.gameTime);
+            }
+          });
+
+          return Column(
+            children: [
+              // Sorting Toggle Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${sortedGames.length} Games Today",
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey.shade600, fontSize: 14),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<SortMethod>(
+                          value: _currentSort,
+                          icon: const Icon(Icons.sort, color: Color(0xFF462255), size: 18),
+                          isDense: true,
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF462255), fontSize: 13),
+                          items: const [
+                            DropdownMenuItem(value: SortMethod.time, child: Text("Sort by Time")),
+                            DropdownMenuItem(value: SortMethod.value, child: Text("Sort by Value")),
+                          ],
+                          onChanged: (SortMethod? newValue) {
+                            if (newValue != null) {
+                              setState(() {
+                                _currentSort = newValue;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Games List
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+                  itemCount: sortedGames.length,
+                  itemBuilder: (context, index) {
+                    final game = sortedGames[index];
+                    return GameListItem(
+                      game: game,
+                      isHomeFavorited: favoriteTeamIds.contains(game.homeTeamId),
+                      isAwayFavorited: favoriteTeamIds.contains(game.awayTeamId),
+                    );
+                  },
+                ),
+              ),
+            ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF462255))),
@@ -52,8 +144,15 @@ class DailyPredictionsPage extends ConsumerWidget {
 
 class GameListItem extends StatelessWidget {
   final GameMatchup game;
+  final bool isHomeFavorited;
+  final bool isAwayFavorited;
 
-  const GameListItem({super.key, required this.game});
+  const GameListItem({
+    super.key,
+    required this.game,
+    required this.isHomeFavorited,
+    required this.isAwayFavorited,
+  });
 
   String _getAbbreviation(String teamId) {
     const Map<String, String> idMap = {
@@ -90,17 +189,18 @@ class GameListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Formats to: "April 10, 7:00 PM"
     final String formattedDateTime = DateFormat('MMMM d, h:mm a').format(game.gameTime);
-
-    // Any game with a positive edge is treated as a consistent value bet
     bool isValueBet = game.odds > 0;
+
+    // Optional subtle outline if the game involves a favorite team
+    bool isGameFavorited = isHomeFavorited || isAwayFavorited;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: isGameFavorited ? Border.all(color: const Color(0xFF462255), width: 1.5) : null,
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
@@ -136,7 +236,6 @@ class GameListItem extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                // Top Row: Date and Time
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
@@ -160,14 +259,10 @@ class GameListItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Matchup Row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(child: _buildTeamDisplay(game.awayTeamId, game.awayTeamName, 'AWAY')),
-
-                    // Stylish VS Badge
+                    Expanded(child: _buildTeamDisplay(game.awayTeamId, game.awayTeamName, 'AWAY', isAwayFavorited)),
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
@@ -177,12 +272,9 @@ class GameListItem extends StatelessWidget {
                       ),
                       child: const Text("VS", style: TextStyle(fontWeight: FontWeight.w900, color: Colors.grey, fontSize: 12)),
                     ),
-
-                    Expanded(child: _buildTeamDisplay(game.homeTeamId, game.homeTeamName, 'HOME')),
+                    Expanded(child: _buildTeamDisplay(game.homeTeamId, game.homeTeamName, 'HOME', isHomeFavorited)),
                   ],
                 ),
-
-                // Value Bet Banner (Consistently Green)
                 if (isValueBet) ...[
                   const SizedBox(height: 24),
                   _buildValueBetArea(),
@@ -195,41 +287,62 @@ class GameListItem extends StatelessWidget {
     );
   }
 
-  Widget _buildTeamDisplay(String teamId, String? teamName, String label) {
+  Widget _buildTeamDisplay(String teamId, String? teamName, String label, bool isFavorited) {
     String teamAbbr = _getAbbreviation(teamId);
     Color teamColor = _getTeamColor(teamAbbr);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Explicit Home/Away Label
         Text(label, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5, color: Colors.grey.shade500)),
         const SizedBox(height: 12),
 
-        // Larger Circle & Stronger Glow
-        Container(
-          width: 85,
-          height: 85,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: teamColor.withValues(alpha: 0.4),
-                  blurRadius: 20,
-                  spreadRadius: 4
-              )
-            ],
-            border: Border.all(color: teamColor.withValues(alpha: 0.2), width: 2),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Image.asset(
-              'assets/logos/$teamAbbr.png',
-              fit: BoxFit.contain,
-              errorBuilder: (context, error, stackTrace) => Center(child: Text(teamAbbr, style: TextStyle(fontWeight: FontWeight.bold, color: teamColor))),
+        Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.topRight,
+          children: [
+            Container(
+              width: 85,
+              height: 85,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      color: teamColor.withValues(alpha: 0.4),
+                      blurRadius: 20,
+                      spreadRadius: 4
+                  )
+                ],
+                border: Border.all(color: teamColor.withValues(alpha: 0.2), width: 2),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Image.asset(
+                  'assets/logos/$teamAbbr.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => Center(child: Text(teamAbbr, style: TextStyle(fontWeight: FontWeight.bold, color: teamColor))),
+                ),
+              ),
             ),
-          ),
+
+            // The Favorited Badge
+            if (isFavorited)
+              Positioned(
+                top: -5,
+                right: -5,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                  ),
+                  child: const Icon(Icons.star, color: Colors.white, size: 16),
+                ),
+              ),
+          ],
         ),
 
         const SizedBox(height: 16),

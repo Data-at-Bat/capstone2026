@@ -10,6 +10,7 @@ import 'package:app/features/auth/presentation/screens/signup_screen.dart';
 import 'package:app/features/profile/presentation/screens/profile_screen.dart';
 import 'package:app/features/auth/presentation/screens/change_password_screen.dart';
 import 'package:app/features/auth/presentation/providers/auth_provider.dart';
+import 'package:app/features/profile/presentation/screens/favorite_selection_screen.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   // Watch the auth state so the router rebuilds when login/logout happens
@@ -56,6 +57,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/change-password',
         builder: (context, state) => const ChangePasswordScreen(),
+      ),
+      GoRoute(
+        path: '/favorites',
+        builder: (context, state) => const FavoritesSelectionScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

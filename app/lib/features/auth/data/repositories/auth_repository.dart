@@ -163,14 +163,13 @@ class AuthRepository {
     if (user == null) throw Exception("No user logged in.");
     if (user.email == null) throw Exception("User has no email.");
 
-    // Step 1: Re-authenticate to prove the user owns the account right now
+    // Re-authenticate to prove the user owns the account right now
     AuthCredential credential = EmailAuthProvider.credential(
       email: user.email!,
       password: currentPassword,
     );
     await user.reauthenticateWithCredential(credential);
 
-    // Step 2: Actually update the password
     await user.updatePassword(newPassword);
   }
 }
