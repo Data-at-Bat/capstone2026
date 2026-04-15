@@ -6,8 +6,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 OUTPUT_DIR = os.path.join(BASE_DIR, "data", "raw")
 OUTPUT_FILE = "odds_raw.csv"
 
-API_KEY = 'b1affd3226b86f1767662cd62b7afe99'
 BASE_URL = "https://api.the-odds-api.com/v4/sports/baseball_mlb/odds"
+API_KEY = os.environ.get("THE_ODDS_API_KEY") or os.environ.get("ODDS_API_KEY")
 
 def fetch_odds():
     params = {
