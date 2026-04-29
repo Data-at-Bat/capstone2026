@@ -73,7 +73,7 @@ THE_ODDS_API_KEY=your_odds_api_key
 ```
 
 ### 4. Running the Backend API
-   
+
 Navigate to the Spring Boot directory and start the server:
 
 ```bash
