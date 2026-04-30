@@ -100,4 +100,18 @@ def save_schedule(df: pd.DataFrame):
     df.to_csv(path, index=False)
     print(f"Saved {len(df)} games to {path}")
 
+if __name__ == "__main__":
+    from datetime import datetime, timedelta
 
+    # Grab today and the next two days to ensure we catch all odds overlaps safely
+    today = datetime.today()
+    start_str = today.strftime("%Y-%m-%d")
+    end_str = (today + timedelta(days=1)).strftime("%Y-%m-%d")
+
+    print(f"Fetching schedule for {start_str} to {end_str}...")
+    df = fetch_schedule(start_str, end_str)
+
+    if df is not None and not df.empty:
+        save_schedule(df)
+    else:
+        print("No games found to save.")

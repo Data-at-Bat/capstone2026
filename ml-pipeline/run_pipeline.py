@@ -15,6 +15,8 @@ import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
+import os
+import subprocess
 
 from dotenv import load_dotenv
 
@@ -53,6 +55,13 @@ def _parse_predict_date(s: str):
 
 
 def _cmd_predict(args: argparse.Namespace) -> None:
+    # If no specific historical season is provided, predict today's slate and push to API
+    if getattr(args, "season", None) is None:
+        print("\nRouting to predict_upcoming_games.py for today's slate and API push...")
+        from scripts.predict_upcoming_games import main as predict_and_push
+        predict_and_push()
+        return
+
     from models.lightgbm_v1.predict import DEFAULT_PREDICTIONS_PATH, run_predict
 
     slate_day = _parse_predict_date(args.predict_date) if getattr(args, "predict_date", "") else None
@@ -71,10 +80,40 @@ def _cmd_predict(args: argparse.Namespace) -> None:
 
 
 def _cmd_full(args: argparse.Namespace) -> None:
+    print(f"\n--- 1. Building Historical Dataset ({args.start_season} to {args.end_season}) ---")
     _cmd_build(args)
+
+    print("\n--- 2. Training Model ---")
     _cmd_train(args)
-    if args.season is None:
-        args.season = args.end_season
+
+    print("\n--- 3. Fetching Live Odds & Building Today's Dataset ---")
+    fetch_dir = ROOT / "data" / "fetch"
+    live_scripts = [
+        "schedule.py",
+        "fetch_odds.py",
+        "match_odds_to_games.py",
+        "build_odds_features.py",
+        "build_upcoming_dataset.py",
+        "fetch_pitcher_stats.py"
+    ]
+
+    # Safely pass the root directory to PYTHONPATH so fetch scripts can import correctly
+    env = os.environ.copy()
+    env["PYTHONPATH"] = str(ROOT)
+
+    for script in live_scripts:
+        script_path = fetch_dir / script
+        if script_path.exists():
+            print(f">>> Running {script}...")
+            result = subprocess.run([sys.executable, str(script_path)], cwd=str(ROOT), env=env)
+            if result.returncode != 0:
+                print(f"WARNING: {script} failed or returned an error.")
+        else:
+            print(f"WARNING: Could not find {script_path}")
+
+    print("\n--- 4. Predicting Upcoming Games & Pushing to API ---")
+    # Force args.season to None so _cmd_predict evaluates today's slate
+    args.season = None
     _cmd_predict(args)
 
 
